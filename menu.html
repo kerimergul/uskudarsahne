@@ -1,179 +1,1555 @@
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Örnek Mekân • Menü</title>
-  <link rel="stylesheet" href="styles.css" />
-</head>
-<body>
-
-<!-- üst bar: geri butonu, başlık -->
-<header class="topbar">
-  <a class="back-btn" href="index.html" aria-label="Geri">←</a>
-  <div class="tb-title">
-    <h1>Örnek Mekân</h1>
-    <p>Menü & Fiyatlar</p>
-  </div>
-</header>
-
-<!-- kategori pill nav: sticky, yatay kaydırma -->
-<nav class="pillnav" id="top">
-  <div class="pillnav__scroller">
-    <a class="pill" href="#kahvalti">Kahvaltı</a>
-    <a class="pill" href="#anayemek">Ana Yemekler</a>
-    <a class="pill" href="#pizza">Pizza</a>
-    <a class="pill" href="#icecek">İçecekler</a>
-  </div>
-</nav>
-
-<main class="container">
-  <!-- Kahvaltı -->
-  <section id="kahvalti" class="section">
-    <div class="section__head">
-      <h2>Kahvaltı</h2>
-      <a class="section__top" href="#top">Yukarı</a>
-    </div>
-    <p class="section__desc">Açıklama (placeholder)</p>
-
-    <div class="stack">
-      <article class="item">
-        <div class="item__thumb placeholder"></div>
-        <div class="item__body">
-          <div class="item__row">
-            <h3 class="item__title">Serpme Kahvaltı (2 Kişilik)</h3>
-            <div class="item__price">₺450.00</div>
-          </div>
-          <p class="item__desc">İçerik açıklaması (placeholder)</p>
+<html class="light" style="color-scheme: light;">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+        <link rel="stylesheet" href="./css/1.css" data-precedence="next" />
+        <link rel="stylesheet" href="./css/2.css" data-precedence="next" />
+        <link rel="preload" as="script" href="./scripts/menu.js" />             
+        <title>Üsküdar Sahne Menü</title>
+        <meta name="description" content="Üsküdar Sahne Menü" />       
+        <link rel="icon" href="/favicon.ico" type="image/x-icon" sizes="32x32" />
+        <meta name="next-size-adjust" />            
+        <link rel="preload" href="/_next/static/media/e4af272ccee01ff0-s.p.woff2" as="font" crossorigin="" type="font/woff2" />
+        <style type="text/css">
+            [data-vaul-drawer] {
+                touch-action: none;
+                will-change: transform;
+                transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1);
+                animation-duration: 0.5s;
+                animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
+            }
+            [data-vaul-drawer][data-vaul-snap-points="false"][data-vaul-drawer-direction="bottom"][data-state="open"] {
+                animation-name: slideFromBottom;
+            }
+            [data-vaul-drawer][data-vaul-snap-points="false"][data-vaul-drawer-direction="bottom"][data-state="closed"] {
+                animation-name: slideToBottom;
+            }
+            [data-vaul-drawer][data-vaul-snap-points="false"][data-vaul-drawer-direction="top"][data-state="open"] {
+                animation-name: slideFromTop;
+            }
+            [data-vaul-drawer][data-vaul-snap-points="false"][data-vaul-drawer-direction="top"][data-state="closed"] {
+                animation-name: slideToTop;
+            }
+            [data-vaul-drawer][data-vaul-snap-points="false"][data-vaul-drawer-direction="left"][data-state="open"] {
+                animation-name: slideFromLeft;
+            }
+            [data-vaul-drawer][data-vaul-snap-points="false"][data-vaul-drawer-direction="left"][data-state="closed"] {
+                animation-name: slideToLeft;
+            }
+            [data-vaul-drawer][data-vaul-snap-points="false"][data-vaul-drawer-direction="right"][data-state="open"] {
+                animation-name: slideFromRight;
+            }
+            [data-vaul-drawer][data-vaul-snap-points="false"][data-vaul-drawer-direction="right"][data-state="closed"] {
+                animation-name: slideToRight;
+            }
+            [data-vaul-drawer][data-vaul-snap-points="true"][data-vaul-drawer-direction="bottom"] {
+                transform: translate3d(0, var(--initial-transform, 100%), 0);
+            }
+            [data-vaul-drawer][data-vaul-snap-points="true"][data-vaul-drawer-direction="top"] {
+                transform: translate3d(0, calc(var(--initial-transform, 100%) * -1), 0);
+            }
+            [data-vaul-drawer][data-vaul-snap-points="true"][data-vaul-drawer-direction="left"] {
+                transform: translate3d(calc(var(--initial-transform, 100%) * -1), 0, 0);
+            }
+            [data-vaul-drawer][data-vaul-snap-points="true"][data-vaul-drawer-direction="right"] {
+                transform: translate3d(var(--initial-transform, 100%), 0, 0);
+            }
+            [data-vaul-drawer][data-vaul-delayed-snap-points="true"][data-vaul-drawer-direction="top"] {
+                transform: translate3d(0, var(--snap-point-height, 0), 0);
+            }
+            [data-vaul-drawer][data-vaul-delayed-snap-points="true"][data-vaul-drawer-direction="bottom"] {
+                transform: translate3d(0, var(--snap-point-height, 0), 0);
+            }
+            [data-vaul-drawer][data-vaul-delayed-snap-points="true"][data-vaul-drawer-direction="left"] {
+                transform: translate3d(var(--snap-point-height, 0), 0, 0);
+            }
+            [data-vaul-drawer][data-vaul-delayed-snap-points="true"][data-vaul-drawer-direction="right"] {
+                transform: translate3d(var(--snap-point-height, 0), 0, 0);
+            }
+            [data-vaul-overlay][data-vaul-snap-points="false"] {
+                animation-duration: 0.5s;
+                animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
+            }
+            [data-vaul-overlay][data-vaul-snap-points="false"][data-state="open"] {
+                animation-name: fadeIn;
+            }
+            [data-vaul-overlay][data-state="closed"] {
+                animation-name: fadeOut;
+            }
+            [data-vaul-animate="false"] {
+                animation: none !important;
+            }
+            [data-vaul-overlay][data-vaul-snap-points="true"] {
+                opacity: 0;
+                transition: opacity 0.5s cubic-bezier(0.32, 0.72, 0, 1);
+            }
+            [data-vaul-overlay][data-vaul-snap-points="true"] {
+                opacity: 1;
+            }
+            [data-vaul-drawer]:not([data-vaul-custom-container="true"])::after {
+                content: "";
+                position: absolute;
+                background: inherit;
+                background-color: inherit;
+            }
+            [data-vaul-drawer][data-vaul-drawer-direction="top"]::after {
+                top: initial;
+                bottom: 100%;
+                left: 0;
+                right: 0;
+                height: 200%;
+            }
+            [data-vaul-drawer][data-vaul-drawer-direction="bottom"]::after {
+                top: 100%;
+                bottom: initial;
+                left: 0;
+                right: 0;
+                height: 200%;
+            }
+            [data-vaul-drawer][data-vaul-drawer-direction="left"]::after {
+                left: initial;
+                right: 100%;
+                top: 0;
+                bottom: 0;
+                width: 200%;
+            }
+            [data-vaul-drawer][data-vaul-drawer-direction="right"]::after {
+                left: 100%;
+                right: initial;
+                top: 0;
+                bottom: 0;
+                width: 200%;
+            }
+            [data-vaul-overlay][data-vaul-snap-points="true"]:not([data-vaul-snap-points-overlay="true"]):not([data-state="closed"]) {
+                opacity: 0;
+            }
+            [data-vaul-overlay][data-vaul-snap-points-overlay="true"] {
+                opacity: 1;
+            }
+            [data-vaul-handle] {
+                display: block;
+                position: relative;
+                opacity: 0.7;
+                background: #e2e2e4;
+                margin-left: auto;
+                margin-right: auto;
+                height: 5px;
+                width: 32px;
+                border-radius: 1rem;
+                touch-action: pan-y;
+            }
+            [data-vaul-handle]:active,
+            [data-vaul-handle]:hover {
+                opacity: 1;
+            }
+            [data-vaul-handle-hitarea] {
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+                width: max(100%, 2.75rem);
+                height: max(100%, 2.75rem);
+                touch-action: inherit;
+            }
+            @media (hover: hover) and (pointer: fine) {
+                [data-vaul-drawer] {
+                    user-select: none;
+                }
+            }
+            @media (pointer: fine) {
+                [data-vaul-handle-hitarea] {
+                    width: 100%;
+                    height: 100%;
+                }
+            }
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                }
+                to {
+                    opacity: 1;
+                }
+            }
+            @keyframes fadeOut {
+                to {
+                    opacity: 0;
+                }
+            }
+            @keyframes slideFromBottom {
+                from {
+                    transform: translate3d(0, var(--initial-transform, 100%), 0);
+                }
+                to {
+                    transform: translate3d(0, 0, 0);
+                }
+            }
+            @keyframes slideToBottom {
+                to {
+                    transform: translate3d(0, var(--initial-transform, 100%), 0);
+                }
+            }
+            @keyframes slideFromTop {
+                from {
+                    transform: translate3d(0, calc(var(--initial-transform, 100%) * -1), 0);
+                }
+                to {
+                    transform: translate3d(0, 0, 0);
+                }
+            }
+            @keyframes slideToTop {
+                to {
+                    transform: translate3d(0, calc(var(--initial-transform, 100%) * -1), 0);
+                }
+            }
+            @keyframes slideFromLeft {
+                from {
+                    transform: translate3d(calc(var(--initial-transform, 100%) * -1), 0, 0);
+                }
+                to {
+                    transform: translate3d(0, 0, 0);
+                }
+            }
+            @keyframes slideToLeft {
+                to {
+                    transform: translate3d(calc(var(--initial-transform, 100%) * -1), 0, 0);
+                }
+            }
+            @keyframes slideFromRight {
+                from {
+                    transform: translate3d(var(--initial-transform, 100%), 0, 0);
+                }
+                to {
+                    transform: translate3d(0, 0, 0);
+                }
+            }
+            @keyframes slideToRight {
+                to {
+                    transform: translate3d(var(--initial-transform, 100%), 0, 0);
+                }
+            }
+        </style>        
+    </head>
+    <body>
+        <next-route-announcer style="position: absolute;"></next-route-announcer>        
+        <iframe height="0" width="0" style="display: none; visibility: hidden;"></iframe>
+        <div class="__className_e8ce0c">
+            <div class="min-h-screen w-full max-w-[500px] md:justify-self-center bg-qrbackground pb-7 mx-auto">
+                <div class="container mx-auto mb-3 px-3">
+                    <div dir="ltr" class="relative w-full whitespace-nowrap mb-0 overflow-hidden scroll-area" style="position: relative; --radix-scroll-area-corner-width: 0px; --radix-scroll-area-corner-height: 0px;">
+                        <style>
+                            [data-radix-scroll-area-viewport] {
+                                scrollbar-width: none;
+                                -ms-overflow-style: none;
+                                -webkit-overflow-scrolling: touch;
+                            }
+                            [data-radix-scroll-area-viewport]::-webkit-scrollbar {
+                                display: none;
+                            }
+                            :where([data-radix-scroll-area-viewport]) {
+                                display: flex;
+                                flex-direction: column;
+                                align-items: stretch;
+                            }
+                            :where([data-radix-scroll-area-content]) {
+                                flex-grow: 1;
+                            }
+                        </style>
+                        <div data-radix-scroll-area-viewport="" class="h-fit w-full rounded-[inherit]" style="overflow: scroll;">
+                            <div data-radix-scroll-area-content="" style="min-width: fit-content;">
+                                <div class="flex w-max space-x-1 p-0 pt-1">
+                                    <div class="w-[109px] border-hidden cursor-pointer">
+                                        <div class="h-[84px] pt-1 line-clamp-1">
+                                            <img
+                                                alt="Sıcak Kahveler"
+                                                loading="lazy"
+                                                width="1920"
+                                                height="1080"
+                                                decoding="async"
+                                                data-nimg="1"
+                                                class="w-full h-full object-cover rounded-t-sm"
+                                                src="https://qrboxdev.b-cdn.net/imagelibrary/1141729259368016.webp"
+                                                style="color: transparent;"
+                                            />
+                                        </div>
+                                        <div class="p-1.5 bg-black/10 bg-black/30 rounded-b-sm">
+                                            <h3 class="text-[11px] leading-tight tracking-tight text-center font-light font-normal line-clamp-1 text-qrblue font-semibold"><p class="line-clamp-1">Sıcak Kahveler</p></h3>
+                                        </div>
+                                    </div>
+                                    <div class="w-[109px] border-hidden cursor-pointer">
+                                        <div class="h-[84px] pt-1 line-clamp-1">
+                                            <img
+                                                alt="Soğuk Kahveler"
+                                                loading="lazy"
+                                                width="1920"
+                                                height="1080"
+                                                decoding="async"
+                                                data-nimg="1"
+                                                class="w-full h-full object-cover rounded-t-sm"
+                                                src="https://qrboxdev.b-cdn.net/imagelibrary/0871729260696875.webp"
+                                                style="color: transparent;"
+                                            />
+                                        </div>
+                                        <div class="p-1.5 bg-black/10 bg-black/30 rounded-b-sm">
+                                            <h3 class="text-[11px] leading-tight tracking-tight text-center font-light font-normal line-clamp-1 font-light font-extralight"><p class="line-clamp-1">Soğuk Kahveler</p></h3>
+                                        </div>
+                                    </div>
+                                    <div class="w-[109px] border-hidden cursor-pointer">
+                                        <div class="h-[84px] pt-1 line-clamp-1">
+                                            <img
+                                                alt="Çay Seçenekleri"
+                                                loading="lazy"
+                                                width="1920"
+                                                height="1080"
+                                                decoding="async"
+                                                data-nimg="1"
+                                                class="w-full h-full object-cover rounded-t-sm"
+                                                src="https://qrboxdev.b-cdn.net/imagelibrary/4451730300140972.webp"
+                                                style="color: transparent;"
+                                            />
+                                        </div>
+                                        <div class="p-1.5 bg-black/10 bg-black/30 rounded-b-sm">
+                                            <h3 class="text-[11px] leading-tight tracking-tight text-center font-light font-normal line-clamp-1 font-light font-extralight"><p class="line-clamp-1">Çay Seçenekleri</p></h3>
+                                        </div>
+                                    </div>
+                                    <div class="w-[109px] border-hidden cursor-pointer">
+                                        <div class="h-[84px] pt-1 line-clamp-1">
+                                            <img
+                                                alt="Meşrubatlar"
+                                                loading="lazy"
+                                                width="1920"
+                                                height="1080"
+                                                decoding="async"
+                                                data-nimg="1"
+                                                class="w-full h-full object-cover rounded-t-sm"
+                                                src="https://qrboxdev.b-cdn.net/imagelibrary/5651730300195836.webp"
+                                                style="color: transparent;"
+                                            />
+                                        </div>
+                                        <div class="p-1.5 bg-black/10 bg-black/30 rounded-b-sm">
+                                            <h3 class="text-[11px] leading-tight tracking-tight text-center font-light font-normal line-clamp-1 font-light font-extralight"><p class="line-clamp-1">Meşrubatlar</p></h3>
+                                        </div>
+                                    </div>
+                                    <div class="w-[109px] border-hidden cursor-pointer">
+                                        <div class="h-[84px] pt-1 line-clamp-1">
+                                            <img
+                                                alt="Atıştırmalıklar"
+                                                loading="lazy"
+                                                width="1920"
+                                                height="1080"
+                                                decoding="async"
+                                                data-nimg="1"
+                                                class="w-full h-full object-cover rounded-t-sm"
+                                                src="https://qrboxdev.b-cdn.net/imagelibrary/5531730301410283.webp"
+                                                style="color: transparent;"
+                                            />
+                                        </div>
+                                        <div class="p-1.5 bg-black/10 bg-black/30 rounded-b-sm">
+                                            <h3 class="text-[11px] leading-tight tracking-tight text-center font-light font-normal line-clamp-1 font-light font-extralight"><p class="line-clamp-1">Atıştırmalıklar</p></h3>
+                                        </div>
+                                    </div>
+                                    <div class="w-[109px] border-hidden cursor-pointer">
+                                        <div class="h-[84px] pt-1 line-clamp-1">
+                                            <img
+                                                alt="Tatlılar"
+                                                loading="lazy"
+                                                width="1920"
+                                                height="1080"
+                                                decoding="async"
+                                                data-nimg="1"
+                                                class="w-full h-full object-cover rounded-t-sm"
+                                                src="https://qrboxdev.b-cdn.net/imagelibrary/1581730315533356.webp"
+                                                style="color: transparent;"
+                                            />
+                                        </div>
+                                        <div class="p-1.5 bg-black/10 bg-black/30 rounded-b-sm">
+                                            <h3 class="text-[11px] leading-tight tracking-tight text-center font-light font-normal line-clamp-1 font-light font-extralight"><p class="line-clamp-1">Tatlılar</p></h3>
+                                        </div>
+                                    </div>                                
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+                    <div class="menu-items">
+                        <div id="category-sicak-kahveler">
+                          <div class="flex flex-col items-center mb-3 mt-3">
+                            <div class="bg-qrborder2 p-2 rounded-sm flex w-full items-center justify-center">
+                              <p class="text-[14px] font-normal font-light tracking-wider text-center overflow-hidden text-ellipsis">
+                                Sıcak Kahveler
+                              </p>
+                            </div>
+                          </div>
+                            <div class="grid gap-2.5 grid-cols-1">
+                                <div class="">
+                                    <div class="relative">
+                                        <div class="cursor-pointer">
+                                            <div class="bg-qrborder/0 border-none rounded-sm">
+                                                <div class="p-0 flex">
+                                                    <div class="w-[50%] aspect-[4/3] flex-shrink-0 relative">
+                                                        <img
+                                                            alt="Zeytin Tabağı"
+                                                            loading="lazy"
+                                                            width="1920"
+                                                            height="1080"
+                                                            decoding="async"
+                                                            data-nimg="1"
+                                                            class="w-full h-full object-cover rounded-sm"
+                                                            src="https://qrboxdev.b-cdn.net/imagelibrary/8491729891699415.webp"
+                                                            style="color: transparent;"
+                                                        />
+                                                        <div class="absolute top-1.5 right-1.5 flex flex-row gap-1.5"></div>
+                                                    </div>
+                                                    <div class="w-[50%] flex flex-col justify-between py-1.5 pl-2.5">
+                                                        <div>
+                                                            <div class="flex items-start space-x-2"><h3 class="text-sm font-normal line-clamp-1">Zeytin Tabağı</h3></div>
+                                                            <p class="text-[11px] mt-1 text-gray-400 text-gray-700 line-clamp-4 font-normal font-light">Özenle seçilmiş karışık zeytin tabağı, özel zeytin yağı ile</p>
+                                                        </div>
+                                                        <div class="flex items-center space-x-2">
+                                                            <span class="font-normal font-light text-[13px] whitespace-nowrap"><span>₺120,00</span></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="">
+                                    <div class="relative">
+                                        <div class="cursor-pointer">
+                                            <div class="bg-qrborder/0 border-none rounded-sm">
+                                                <div class="p-0 flex">
+                                                    <div class="w-[50%] aspect-[4/3] flex-shrink-0 relative">
+                                                        <img
+                                                            alt="Domates Tabağı"
+                                                            loading="lazy"
+                                                            width="1920"
+                                                            height="1080"
+                                                            decoding="async"
+                                                            data-nimg="1"
+                                                            class="w-full h-full object-cover rounded-sm"
+                                                            src="https://qrboxdev.b-cdn.net/imagelibrary/0891729891652511.webp?t=1733350605427"
+                                                            style="color: transparent;"
+                                                        />
+                                                        <div class="absolute top-1.5 right-1.5 flex flex-row gap-1.5"></div>
+                                                    </div>
+                                                    <div class="w-[50%] flex flex-col justify-between py-1.5 pl-2.5">
+                                                        <div>
+                                                            <div class="flex items-start space-x-2"><h3 class="text-sm font-normal line-clamp-1">Domates Tabağı</h3></div>
+                                                            <p class="text-[11px] mt-1 text-gray-400 text-gray-700 line-clamp-4 font-normal font-light">Soğan, fesleğen, zeytinyağı, balzamik ile taze domates dilimleri</p>
+                                                        </div>
+                                                        <div class="flex items-center space-x-2">
+                                                            <span class="font-normal font-light text-[13px] whitespace-nowrap"><span>₺110,00</span></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="">
+                                    <div class="relative">
+                                        <div class="cursor-pointer">
+                                            <div class="bg-qrborder/0 border-none rounded-sm">
+                                                <div class="p-0 flex">
+                                                    <div class="w-[50%] aspect-[4/3] flex-shrink-0 relative">
+                                                        <img
+                                                            alt="Avokado Tabağı"
+                                                            loading="lazy"
+                                                            width="1920"
+                                                            height="1080"
+                                                            decoding="async"
+                                                            data-nimg="1"
+                                                            class="w-full h-full object-cover rounded-sm"
+                                                            src="https://qrboxdev.b-cdn.net/imagelibrary/0451729891497024.webp?t=1733350612906"
+                                                            style="color: transparent;"
+                                                        />
+                                                        <div class="absolute top-1.5 right-1.5 flex flex-row gap-1.5"></div>
+                                                    </div>
+                                                    <div class="w-[50%] flex flex-col justify-between py-1.5 pl-2.5">
+                                                        <div>
+                                                            <div class="flex items-start space-x-2"><h3 class="text-sm font-normal line-clamp-1">Avokado Tabağı</h3></div>
+                                                            <p class="text-[11px] mt-1 text-gray-400 text-gray-700 line-clamp-4 font-normal font-light">Baharatlı dilimlenmiş taze avokado</p>
+                                                        </div>
+                                                        <div class="flex items-center space-x-2">
+                                                            <span class="font-normal font-light text-[13px] whitespace-nowrap"><span>₺180,00</span></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="">
+                                    <div class="relative">
+                                        <div class="cursor-pointer">
+                                            <div class="bg-qrborder/0 border-none rounded-sm">
+                                                <div class="p-0 flex">
+                                                    <div class="w-[50%] aspect-[4/3] flex-shrink-0 relative">
+                                                        <img
+                                                            alt="Karışık Peynir Tabağı "
+                                                            loading="lazy"
+                                                            width="1920"
+                                                            height="1080"
+                                                            decoding="async"
+                                                            data-nimg="1"
+                                                            class="w-full h-full object-cover rounded-sm"
+                                                            src="https://qrboxdev.b-cdn.net/imagelibrary/9661729891681767.webp?t=1733350590995"
+                                                            style="color: transparent;"
+                                                        />
+                                                        <div class="absolute top-1.5 right-1.5 flex flex-row gap-1.5"></div>
+                                                    </div>
+                                                    <div class="w-[50%] flex flex-col justify-between py-1.5 pl-2.5">
+                                                        <div>
+                                                            <div class="flex items-start space-x-2"><h3 class="text-sm font-normal line-clamp-1">Karışık Peynir Tabağı</h3></div>
+                                                            <p class="text-[11px] mt-1 text-gray-400 text-gray-700 line-clamp-4 font-normal font-light">Ev yapımı peynir çeşitleri</p>
+                                                        </div>
+                                                        <div class="flex items-center space-x-2">
+                                                            <span class="font-normal font-light text-[13px] whitespace-nowrap"><span>₺280,00</span></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="">
+                                    <div class="relative">
+                                        <div class="cursor-pointer">
+                                            <div class="bg-qrborder/0 border-none rounded-sm">
+                                                <div class="p-0 flex">
+                                                    <div class="w-[50%] aspect-[4/3] flex-shrink-0 relative">
+                                                        <img
+                                                            alt="İncir Reçeli"
+                                                            loading="lazy"
+                                                            width="1920"
+                                                            height="1080"
+                                                            decoding="async"
+                                                            data-nimg="1"
+                                                            class="w-full h-full object-cover rounded-sm"
+                                                            src="https://qrboxdev.b-cdn.net/imagelibrary/4601729891587783.webp?t=1733345294568"
+                                                            style="color: transparent;"
+                                                        />
+                                                        <div class="absolute top-1.5 right-1.5 flex flex-row gap-1.5"></div>
+                                                    </div>
+                                                    <div class="w-[50%] flex flex-col justify-between py-1.5 pl-2.5">
+                                                        <div>
+                                                            <div class="flex items-start space-x-2"><h3 class="text-sm font-normal line-clamp-1">İncir Reçeli</h3></div>
+                                                            <p class="text-[11px] mt-1 text-gray-400 text-gray-700 line-clamp-4 font-normal font-light">Ev yapımı incir reçeli</p>
+                                                        </div>
+                                                        <div class="flex items-center space-x-2">
+                                                            <span class="font-normal font-light text-[13px] whitespace-nowrap"><span>₺100,00</span></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="">
+                                    <div class="relative">
+                                        <div class="cursor-pointer">
+                                            <div class="bg-qrborder/0 border-none rounded-sm">
+                                                <div class="p-0 flex">
+                                                    <div class="w-[50%] aspect-[4/3] flex-shrink-0 relative">
+                                                        <img
+                                                            alt="Kruvasan Kahvaltısı"
+                                                            loading="lazy"
+                                                            width="1920"
+                                                            height="1080"
+                                                            decoding="async"
+                                                            data-nimg="1"
+                                                            class="w-full h-full object-cover rounded-sm"
+                                                            src="https://qrboxdev.b-cdn.net/imagelibrary/7771729887477386.webp?t=1733350637372"
+                                                            style="color: transparent;"
+                                                        />
+                                                        <div class="absolute top-1.5 right-1.5 flex flex-row gap-1.5"></div>
+                                                    </div>
+                                                    <div class="w-[50%] flex flex-col justify-between py-1.5 pl-2.5">
+                                                        <div>
+                                                            <div class="flex items-start space-x-2"><h3 class="text-sm font-normal line-clamp-1">Kruvasan Kahvaltısı</h3></div>
+                                                            <p class="text-[11px] mt-1 text-gray-400 text-gray-700 line-clamp-4 font-normal font-light">Tereyağı ve reçel çeşitleri ile servis edilen taze pişirilmiş kruvasan</p>
+                                                        </div>
+                                                        <div class="flex items-center space-x-2">
+                                                            <span class="font-normal font-light text-[13px] whitespace-nowrap"><span>₺200,00</span></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="">
+                                    <div class="relative">
+                                        <div class="cursor-pointer">
+                                            <div class="bg-qrborder/0 border-none rounded-sm">
+                                                <div class="p-0 flex">
+                                                    <div class="w-[50%] aspect-[4/3] flex-shrink-0 relative">
+                                                        <img
+                                                            alt="Pastırmalı Yumurta"
+                                                            loading="lazy"
+                                                            width="1920"
+                                                            height="1080"
+                                                            decoding="async"
+                                                            data-nimg="1"
+                                                            class="w-full h-full object-cover rounded-sm"
+                                                            src="https://qrboxdev.b-cdn.net/imagelibrary/9181729523909308.webp?t=1733350621441"
+                                                            style="color: transparent;"
+                                                        />
+                                                        <div class="absolute top-1.5 right-1.5 flex flex-row gap-1.5"></div>
+                                                    </div>
+                                                    <div class="w-[50%] flex flex-col justify-between py-1.5 pl-2.5">
+                                                        <div>
+                                                            <div class="flex items-start space-x-2"><h3 class="text-sm font-normal line-clamp-1">Pastırmalı Yumurta</h3></div>
+                                                            <p class="text-[11px] mt-1 text-gray-400 text-gray-700 line-clamp-4 font-normal font-light">Tercih edilen şekilde pişirilmiş yumurta ve çıtır pastırma</p>
+                                                        </div>
+                                                        <div class="flex items-center space-x-2">
+                                                            <span class="font-normal font-light text-[13px] whitespace-nowrap"><span>₺220,00</span></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="">
+                                    <div class="relative">
+                                        <div class="cursor-pointer">
+                                            <div class="bg-qrborder/0 border-none rounded-sm">
+                                                <div class="p-0 flex">
+                                                    <div class="w-[50%] aspect-[4/3] flex-shrink-0 relative">
+                                                        <img
+                                                            alt="Granola"
+                                                            loading="lazy"
+                                                            width="1920"
+                                                            height="1080"
+                                                            decoding="async"
+                                                            data-nimg="1"
+                                                            class="w-full h-full object-cover rounded-sm"
+                                                            src="https://qrboxdev.b-cdn.net/imagelibrary/0851730832636858.webp?t=1733350628294"
+                                                            style="color: transparent;"
+                                                        />
+                                                        <div class="absolute top-1.5 right-1.5 flex flex-row gap-1.5"></div>
+                                                    </div>
+                                                    <div class="w-[50%] flex flex-col justify-between py-1.5 pl-2.5">
+                                                        <div>
+                                                            <div class="flex items-start space-x-2"><h3 class="text-sm font-normal line-clamp-1">Granola</h3></div>
+                                                            <p class="text-[11px] mt-1 text-gray-400 text-gray-700 line-clamp-4 font-normal font-light">Yoğurt ve meyve ile ev yapımı granola</p>
+                                                        </div>
+                                                        <div class="flex items-center space-x-2">
+                                                            <span class="font-normal font-light text-[13px] whitespace-nowrap"><span>₺150,00</span></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="category-soguk-kahveler">
+                            <div class="flex flex-col items-center mb-3 mt-3">
+                                <div class="bg-qrborder2 p-2 rounded-sm flex w-full items-center justify-center">
+                                    <p class="text-[14px] font-normal font-light tracking-wider text-center overflow-hidden text-ellipsis">Soğuk Kahveler</p>
+                                </div>
+                            </div>
+                            <div class="flex flex-row"></div>
+                            <div class="grid gap-2.5 grid-cols-1">
+                                <div class="">
+                                    <div class="relative">
+                                        <div class="cursor-pointer">
+                                            <div class="bg-qrborder/0 border-none rounded-sm">
+                                                <div class="p-0 flex">
+                                                    <div class="w-[50%] aspect-[4/3] flex-shrink-0 relative">
+                                                        <img
+                                                            alt="Ton Balıklı Peynirli Sandviç"
+                                                            loading="lazy"
+                                                            width="1920"
+                                                            height="1080"
+                                                            decoding="async"
+                                                            data-nimg="1"
+                                                            class="w-full h-full object-cover rounded-sm"
+                                                            src="https://qrboxdev.b-cdn.net/imagelibrary/6661732798936075.webp?t=1733350646773"
+                                                            style="color: transparent;"
+                                                        />
+                                                        <div class="absolute top-1.5 right-1.5 flex flex-row gap-1.5">
+                                                            <div
+                                                                class="inline-flex items-center rounded-sm border transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent text-[10px] bg-qrblue text-white font-semibold px-[5px] py-[2px]"
+                                                            >
+                                                                YENİ
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="w-[50%] flex flex-col justify-between py-1.5 pl-2.5">
+                                                        <div>
+                                                            <div class="flex items-start space-x-2"><h3 class="text-sm font-normal line-clamp-1">Ton Balıklı Peynirli Sandviç</h3></div>
+                                                            <p class="text-[11px] mt-1 text-gray-400 text-gray-700 line-clamp-4 font-normal font-light">
+                                                                Ton balığı, eritilmiş peynir ve taze yeşilliklerle hazırlanmış, ızgara sandviç
+                                                            </p>
+                                                        </div>
+                                                        <div class="flex items-center space-x-2">
+                                                            <span class="font-normal font-light text-[13px] whitespace-nowrap"><span>₺220,00</span></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="">
+                                    <div class="relative">
+                                        <div class="cursor-pointer">
+                                            <div class="bg-qrborder/0 border-none rounded-sm">
+                                                <div class="p-0 flex">
+                                                    <div class="w-[50%] aspect-[4/3] flex-shrink-0 relative">
+                                                        <img
+                                                            alt="Dana Etli Sandviç"
+                                                            loading="lazy"
+                                                            width="1920"
+                                                            height="1080"
+                                                            decoding="async"
+                                                            data-nimg="1"
+                                                            class="w-full h-full object-cover rounded-sm"
+                                                            src="https://qrboxdev.b-cdn.net/imagelibrary/9921732799406530.webp?t=1733350651518"
+                                                            style="color: transparent;"
+                                                        />
+                                                        <div class="absolute top-1.5 right-1.5 flex flex-row gap-1.5"></div>
+                                                    </div>
+                                                    <div class="w-[50%] flex flex-col justify-between py-1.5 pl-2.5">
+                                                        <div>
+                                                            <div class="flex items-start space-x-2"><h3 class="text-sm font-normal line-clamp-1">Dana Etli Sandviç</h3></div>
+                                                            <p class="text-[11px] mt-1 text-gray-400 text-gray-700 line-clamp-4 font-normal font-light">
+                                                                Taze doğranmış dana eti, karamelize soğan ve özel sosla hazırlanmış lezzetli sandviç
+                                                            </p>
+                                                        </div>
+                                                        <div class="flex items-center space-x-2">
+                                                            <span class="font-normal font-light text-[13px] whitespace-nowrap"><span>₺280,00</span></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="">
+                                    <div class="relative">
+                                        <div class="cursor-pointer">
+                                            <div class="bg-qrborder/0 border-none rounded-sm">
+                                                <div class="p-0 flex">
+                                                    <div class="w-[50%] aspect-[4/3] flex-shrink-0 relative">
+                                                        <img
+                                                            alt="Avokadolu Sandviç"
+                                                            loading="lazy"
+                                                            width="1920"
+                                                            height="1080"
+                                                            decoding="async"
+                                                            data-nimg="1"
+                                                            class="w-full h-full object-cover rounded-sm"
+                                                            src="https://qrboxdev.b-cdn.net/imagelibrary/1311732799440442.webp?t=1733350656590"
+                                                            style="color: transparent;"
+                                                        />
+                                                        <div class="absolute top-1.5 right-1.5 flex flex-row gap-1.5"></div>
+                                                    </div>
+                                                    <div class="w-[50%] flex flex-col justify-between py-1.5 pl-2.5">
+                                                        <div>
+                                                            <div class="flex items-start space-x-2"><h3 class="text-sm font-normal line-clamp-1">Avokadolu Sandviç</h3></div>
+                                                            <p class="text-[11px] mt-1 text-gray-400 text-gray-700 line-clamp-4 font-normal font-light">Taze avokado, çeri domates ve roka ile hazırlanmış sağlıklı sandviç</p>
+                                                        </div>
+                                                        <div class="flex items-center space-x-2">
+                                                            <span class="font-normal font-light text-[13px] whitespace-nowrap"><span>₺240,00</span></span>
+                                                            <svg
+                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                width="24"
+                                                                height="24"
+                                                                viewBox="0 0 24 24"
+                                                                fill="green"
+                                                                stroke="green"
+                                                                stroke-width="2"
+                                                                stroke-linecap="round"
+                                                                stroke-linejoin="round"
+                                                                class="lucide lucide-leaf h-4 w-4"
+                                                            >
+                                                                <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path>
+                                                                <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path>
+                                                            </svg>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="">
+                                    <div class="relative">
+                                        <div class="cursor-pointer">
+                                            <div class="bg-qrborder/0 border-none rounded-sm">
+                                                <div class="p-0 flex">
+                                                    <div class="w-[50%] aspect-[4/3] flex-shrink-0 relative">
+                                                        <img
+                                                            alt="Cheddar Peynirli Tost"
+                                                            loading="lazy"
+                                                            width="1920"
+                                                            height="1080"
+                                                            decoding="async"
+                                                            data-nimg="1"
+                                                            class="w-full h-full object-cover rounded-sm"
+                                                            src="https://qrboxdev.b-cdn.net/imagelibrary/7451732799280788.webp?t=1733350661598"
+                                                            style="color: transparent;"
+                                                        />
+                                                        <div class="absolute top-1.5 right-1.5 flex flex-row gap-1.5"></div>
+                                                    </div>
+                                                    <div class="w-[50%] flex flex-col justify-between py-1.5 pl-2.5">
+                                                        <div>
+                                                            <div class="flex items-start space-x-2"><h3 class="text-sm font-normal line-clamp-1">Cheddar Peynirli Tost</h3></div>
+                                                            <p class="text-[11px] mt-1 text-gray-400 text-gray-700 line-clamp-4 font-normal font-light">
+                                                                Eritilmiş cheddar peynirli klasik tost, domates ve marul ile servis edilir.
+                                                            </p>
+                                                        </div>
+                                                        <div class="flex items-center space-x-2">
+                                                            <span class="font-normal font-light text-[13px] whitespace-nowrap"><span>₺190,00</span></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="category-cay-secenekleri">
+                            <div class="flex flex-col items-center mb-3 mt-3">
+                                <div class="bg-qrborder2 p-2 rounded-sm flex w-full items-center justify-center"><p class="text-[14px] font-normal font-light tracking-wider text-center overflow-hidden text-ellipsis">Çay Seçenekleri</p></div>
+                            </div>
+                            <div class="flex flex-row"></div>
+                            <div class="grid gap-2.5 grid-cols-1">
+                                <div class="">
+                                    <div class="relative">
+                                        <div class="cursor-pointer">
+                                            <div class="bg-qrborder/0 border-none rounded-sm">
+                                                <div class="p-0 flex">
+                                                    <div class="w-[50%] aspect-[4/3] flex-shrink-0 relative">
+                                                        <img
+                                                            alt="Taco"
+                                                            loading="lazy"
+                                                            width="1920"
+                                                            height="1080"
+                                                            decoding="async"
+                                                            data-nimg="1"
+                                                            class="w-full h-full object-cover rounded-sm"
+                                                            src="https://qrboxdev.b-cdn.net/imagelibrary/8891729180348978.webp?t=1733350667183"
+                                                            style="color: transparent;"
+                                                        />
+                                                        <div class="absolute top-1.5 right-1.5 flex flex-row gap-1.5"></div>
+                                                    </div>
+                                                    <div class="w-[50%] flex flex-col justify-between py-1.5 pl-2.5">
+                                                        <div>
+                                                            <div class="flex items-start space-x-2"><h3 class="text-sm font-normal line-clamp-1">Taco</h3></div>
+                                                            <p class="text-[11px] mt-1 text-gray-400 text-gray-700 line-clamp-4 font-normal font-light">
+                                                                Çıtır tortilla içinde Marine edilmiş ızgara et, taze avokado, limon ve taze kişniş. Otantik Meksika lezzeti
+                                                            </p>
+                                                        </div>
+                                                        <div class="flex items-center space-x-2">
+                                                            <span class="font-normal font-light text-[13px] whitespace-nowrap"><span>₺180,00</span></span>
+                                                            <svg
+                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                width="24"
+                                                                height="24"
+                                                                viewBox="0 0 24 24"
+                                                                fill="red"
+                                                                stroke="red"
+                                                                stroke-width="2"
+                                                                stroke-linecap="round"
+                                                                stroke-linejoin="round"
+                                                                class="lucide lucide-flame h-4 w-4"
+                                                            >
+                                                                <path
+                                                                    d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"
+                                                                ></path>
+                                                            </svg>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="">
+                                    <div class="relative">
+                                        <div class="cursor-pointer">
+                                            <div class="bg-qrborder/0 border-none rounded-sm">
+                                                <div class="p-0 flex">
+                                                    <div class="w-[50%] aspect-[4/3] flex-shrink-0 relative">
+                                                        <img
+                                                            alt="Sebzeli Taco"
+                                                            loading="lazy"
+                                                            width="1920"
+                                                            height="1080"
+                                                            decoding="async"
+                                                            data-nimg="1"
+                                                            class="w-full h-full object-cover rounded-sm"
+                                                            src="https://qrboxdev.b-cdn.net/imagelibrary/8071729180696835.webp?t=1733350671542"
+                                                            style="color: transparent;"
+                                                        />
+                                                        <div class="absolute top-1.5 right-1.5 flex flex-row gap-1.5"></div>
+                                                    </div>
+                                                    <div class="w-[50%] flex flex-col justify-between py-1.5 pl-2.5">
+                                                        <div>
+                                                            <div class="flex items-start space-x-2"><h3 class="text-sm font-normal line-clamp-1">Sebzeli Taco</h3></div>
+                                                            <p class="text-[11px] mt-1 text-gray-400 text-gray-700 line-clamp-4 font-normal font-light">
+                                                                Izgarada pişmiş mevsim sebzeleri, körili nohut, taze avokado ve kişniş. Çıtır tortillada sunulur
+                                                            </p>
+                                                        </div>
+                                                        <div class="flex items-center space-x-2">
+                                                            <span class="font-normal font-light text-[13px] whitespace-nowrap"><span>₺160,00</span></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="category-mesrubatlar">
+                            <div class="flex flex-col items-center mb-3 mt-3">
+                                <div class="bg-qrborder2 p-2 rounded-sm flex w-full items-center justify-center"><p class="text-[14px] font-normal font-light tracking-wider text-center overflow-hidden text-ellipsis">Meşrubatlar</p></div>
+                            </div>
+                            <div class="flex flex-row"></div>
+                            <div class="grid gap-2.5 grid-cols-1">
+                                <div class="">
+                                    <div class="relative">
+                                        <div class="cursor-pointer">
+                                            <div class="bg-qrborder/0 border-none rounded-sm">
+                                                <div class="p-0 flex">
+                                                    <div class="w-[50%] aspect-[4/3] flex-shrink-0 relative">
+                                                        <img
+                                                            alt="Napoli Pizza"
+                                                            loading="lazy"
+                                                            width="1920"
+                                                            height="1080"
+                                                            decoding="async"
+                                                            data-nimg="1"
+                                                            class="w-full h-full object-cover rounded-sm"
+                                                            src="https://qrboxdev.b-cdn.net/imagelibrary/6601730462197949.webp?t=1733350684040"
+                                                            style="color: transparent;"
+                                                        />
+                                                        <div class="absolute top-1.5 right-1.5 flex flex-row gap-1.5"></div>
+                                                    </div>
+                                                    <div class="w-[50%] flex flex-col justify-between py-1.5 pl-2.5">
+                                                        <div>
+                                                            <div class="flex items-start space-x-2"><h3 class="text-sm font-normal line-clamp-1">Napoli Pizza</h3></div>
+                                                            <p class="text-[11px] mt-1 text-gray-400 text-gray-700 line-clamp-4 font-normal font-light">
+                                                                Domates sosu, mozzarella ve taze fesleğen ile hazırlanmış geleneksel İtalyan pizzası
+                                                            </p>
+                                                        </div>
+                                                        <div class="flex items-center space-x-2">
+                                                            <span class="font-normal font-light text-[13px] whitespace-nowrap"><span>₺180,00</span></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="">
+                                    <div class="relative">
+                                        <div class="cursor-pointer">
+                                            <div class="bg-qrborder/0 border-none rounded-sm">
+                                                <div class="p-0 flex">
+                                                    <div class="w-[50%] aspect-[4/3] flex-shrink-0 relative">
+                                                        <img
+                                                            alt="Pesto Pizza"
+                                                            loading="lazy"
+                                                            width="1920"
+                                                            height="1080"
+                                                            decoding="async"
+                                                            data-nimg="1"
+                                                            class="w-full h-full object-cover rounded-sm"
+                                                            src="https://qrboxdev.b-cdn.net/imagelibrary/7751730462760536.webp?t=1733350689220"
+                                                            style="color: transparent;"
+                                                        />
+                                                        <div class="absolute top-1.5 right-1.5 flex flex-row gap-1.5"></div>
+                                                    </div>
+                                                    <div class="w-[50%] flex flex-col justify-between py-1.5 pl-2.5">
+                                                        <div>
+                                                            <div class="flex items-start space-x-2"><h3 class="text-sm font-normal line-clamp-1">Pesto Pizza</h3></div>
+                                                            <p class="text-[11px] mt-1 text-gray-400 text-gray-700 line-clamp-4 font-normal font-light">
+                                                                Taze fesleğen pesto sos, mozzarella peyniri ve çeri domates ile hazırlanmış İtalyan pizzası
+                                                            </p>
+                                                        </div>
+                                                        <div class="flex items-center space-x-2">
+                                                            <span class="font-normal font-light text-[13px] whitespace-nowrap"><span>₺200,00</span></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="">
+                                    <div class="relative">
+                                        <div class="cursor-pointer">
+                                            <div class="bg-qrborder/0 border-none rounded-sm">
+                                                <div class="p-0 flex">
+                                                    <div class="w-[50%] aspect-[4/3] flex-shrink-0 relative">
+                                                        <img
+                                                            alt="Etli Pizza"
+                                                            loading="lazy"
+                                                            width="1920"
+                                                            height="1080"
+                                                            decoding="async"
+                                                            data-nimg="1"
+                                                            class="w-full h-full object-cover rounded-sm"
+                                                            src="https://qrboxdev.b-cdn.net/imagelibrary/6671730462738575.webp?t=1733350694049"
+                                                            style="color: transparent;"
+                                                        />
+                                                        <div class="absolute top-1.5 right-1.5 flex flex-row gap-1.5"></div>
+                                                    </div>
+                                                    <div class="w-[50%] flex flex-col justify-between py-1.5 pl-2.5">
+                                                        <div>
+                                                            <div class="flex items-start space-x-2"><h3 class="text-sm font-normal line-clamp-1">Etli Pizza</h3></div>
+                                                            <p class="text-[11px] mt-1 text-gray-400 text-gray-700 line-clamp-4 font-normal font-light">
+                                                                İtalyan soslu özel baharat karışımı ile marine edilmiş, pepperoni, sosis, jambon ve mozzarella peynirli pizza
+                                                            </p>
+                                                        </div>
+                                                        <div class="flex items-center space-x-2">
+                                                            <span class="font-normal font-light text-[13px] whitespace-nowrap"><span>₺250,00</span></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="">
+                                    <div class="relative">
+                                        <div class="cursor-pointer">
+                                            <div class="bg-qrborder/0 border-none rounded-sm">
+                                                <div class="p-0 flex">
+                                                    <div class="w-[50%] aspect-[4/3] flex-shrink-0 relative">
+                                                        <img
+                                                            alt="Vegan Pizza"
+                                                            loading="lazy"
+                                                            width="1920"
+                                                            height="1080"
+                                                            decoding="async"
+                                                            data-nimg="1"
+                                                            class="w-full h-full object-cover rounded-sm"
+                                                            src="https://qrboxdev.b-cdn.net/imagelibrary/0691730462662259.webp?t=1733350703637"
+                                                            style="color: transparent;"
+                                                        />
+                                                        <div class="absolute top-1.5 right-1.5 flex flex-row gap-1.5"></div>
+                                                    </div>
+                                                    <div class="w-[50%] flex flex-col justify-between py-1.5 pl-2.5">
+                                                        <div>
+                                                            <div class="flex items-start space-x-2"><h3 class="text-sm font-normal line-clamp-1">Vegan Pizza</h3></div>
+                                                            <p class="text-[11px] mt-1 text-gray-400 text-gray-700 line-clamp-4 font-normal font-light">Sebze çeşitleri, vegan mozzarella ve özel sos ile hazırlanmış pizza</p>
+                                                        </div>
+                                                        <div class="flex items-center space-x-2">
+                                                            <span class="font-normal font-light text-[13px] whitespace-nowrap"><span>₺190,00</span></span>
+                                                            <svg
+                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                width="24"
+                                                                height="24"
+                                                                viewBox="0 0 24 24"
+                                                                fill="green"
+                                                                stroke="green"
+                                                                stroke-width="2"
+                                                                stroke-linecap="round"
+                                                                stroke-linejoin="round"
+                                                                class="lucide lucide-leaf h-4 w-4"
+                                                            >
+                                                                <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path>
+                                                                <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path>
+                                                            </svg>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="category-atistirmaliklar">
+                            <div class="flex flex-col items-center mb-3 mt-3">
+                                <div class="bg-qrborder2 p-2 rounded-sm flex w-full items-center justify-center"><p class="text-[14px] font-normal font-light tracking-wider text-center overflow-hidden text-ellipsis">Atıştırmalıklar</p></div>
+                            </div>
+                            <div class="flex flex-row"></div>
+                            <div class="grid gap-2.5 grid-cols-1">
+                                <div class="">
+                                    <div class="relative">
+                                        <div class="cursor-pointer">
+                                            <div class="bg-qrborder/0 border-none rounded-sm">
+                                                <div class="p-0 flex">
+                                                    <div class="w-[50%] aspect-[4/3] flex-shrink-0 relative">
+                                                        <img
+                                                            alt="Café de Paris Biftek"
+                                                            loading="lazy"
+                                                            width="1920"
+                                                            height="1080"
+                                                            decoding="async"
+                                                            data-nimg="1"
+                                                            class="w-full h-full object-cover rounded-sm"
+                                                            src="https://qrboxdev.b-cdn.net/imagelibrary/5491730823111967.webp?t=1733350717266"
+                                                            style="color: transparent;"
+                                                        />
+                                                        <div class="absolute top-1.5 right-1.5 flex flex-row gap-1.5"></div>
+                                                    </div>
+                                                    <div class="w-[50%] flex flex-col justify-between py-1.5 pl-2.5">
+                                                        <div>
+                                                            <div class="flex items-start space-x-2"><h3 class="text-sm font-normal line-clamp-1">Café de Paris Biftek</h3></div>
+                                                            <p class="text-[11px] mt-1 text-gray-400 text-gray-700 line-clamp-4 font-normal font-light">Özel Café de Paris sosuyla marine edilmiş tender dana biftek</p>
+                                                        </div>
+                                                        <div class="flex items-center space-x-2">
+                                                            <span class="font-normal font-light text-[13px] whitespace-nowrap"><span>₺750,00</span></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="">
+                                    <div class="relative">
+                                        <div class="cursor-pointer">
+                                            <div class="bg-qrborder/0 border-none rounded-sm">
+                                                <div class="p-0 flex">
+                                                    <div class="w-[50%] aspect-[4/3] flex-shrink-0 relative">
+                                                        <img
+                                                            alt="Dana Bonfile"
+                                                            loading="lazy"
+                                                            width="1920"
+                                                            height="1080"
+                                                            decoding="async"
+                                                            data-nimg="1"
+                                                            class="w-full h-full object-cover rounded-sm"
+                                                            src="https://qrboxdev.b-cdn.net/imagelibrary/3121729687946171.webp?t=1733350724264"
+                                                            style="color: transparent;"
+                                                        />
+                                                        <div class="absolute top-1.5 right-1.5 flex flex-row gap-1.5"></div>
+                                                    </div>
+                                                    <div class="w-[50%] flex flex-col justify-between py-1.5 pl-2.5">
+                                                        <div>
+                                                            <div class="flex items-start space-x-2"><h3 class="text-sm font-normal line-clamp-1">Dana Bonfile</h3></div>
+                                                            <p class="text-[11px] mt-1 text-gray-400 text-gray-700 line-clamp-4 font-normal font-light">Ustalıkla mühürlenmiş, özel baharatlarla marine edilmiş dana bonfile</p>
+                                                        </div>
+                                                        <div class="flex items-center space-x-2">
+                                                            <span class="font-normal font-light text-[13px] whitespace-nowrap"><span>₺820,00</span></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="">
+                                    <div class="relative">
+                                        <div class="cursor-pointer">
+                                            <div class="bg-qrborder/0 border-none rounded-sm">
+                                                <div class="p-0 flex">
+                                                    <div class="w-[50%] aspect-[4/3] flex-shrink-0 relative">
+                                                        <img
+                                                            alt="Antrikot"
+                                                            loading="lazy"
+                                                            width="1920"
+                                                            height="1080"
+                                                            decoding="async"
+                                                            data-nimg="1"
+                                                            class="w-full h-full object-cover rounded-sm"
+                                                            src="https://qrboxdev.b-cdn.net/imagelibrary/3301729687804677.webp?t=1733350729606"
+                                                            style="color: transparent;"
+                                                        />
+                                                        <div class="absolute top-1.5 right-1.5 flex flex-row gap-1.5"></div>
+                                                    </div>
+                                                    <div class="w-[50%] flex flex-col justify-between py-1.5 pl-2.5">
+                                                        <div>
+                                                            <div class="flex items-start space-x-2"><h3 class="text-sm font-normal line-clamp-1">Antrikot</h3></div>
+                                                            <p class="text-[11px] mt-1 text-gray-400 text-gray-700 line-clamp-4 font-normal font-light">Özel baharatlarla marine edilmiş, mühürlenmiş antrikot</p>
+                                                        </div>
+                                                        <div class="flex items-center space-x-2">
+                                                            <span class="font-normal font-light text-[13px] whitespace-nowrap"><span>₺680,00</span></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="">
+                                    <div class="relative">
+                                        <div class="cursor-pointer">
+                                            <div class="bg-qrborder/0 border-none rounded-sm">
+                                                <div class="p-0 flex">
+                                                    <div class="w-[50%] aspect-[4/3] flex-shrink-0 relative">
+                                                        <img
+                                                            alt="Izgara Biftek"
+                                                            loading="lazy"
+                                                            width="1920"
+                                                            height="1080"
+                                                            decoding="async"
+                                                            data-nimg="1"
+                                                            class="w-full h-full object-cover rounded-sm"
+                                                            src="https://qrboxdev.b-cdn.net/imagelibrary/2041729688152284.webp?t=1733350741340"
+                                                            style="color: transparent;"
+                                                        />
+                                                        <div class="absolute top-1.5 right-1.5 flex flex-row gap-1.5"></div>
+                                                    </div>
+                                                    <div class="w-[50%] flex flex-col justify-between py-1.5 pl-2.5">
+                                                        <div>
+                                                            <div class="flex items-start space-x-2"><h3 class="text-sm font-normal line-clamp-1">Izgara Biftek</h3></div>
+                                                            <p class="text-[11px] mt-1 text-gray-400 text-gray-700 line-clamp-4 font-normal font-light">İsteğe bağlı orta, iyi, az pişirilmiş lezzetli ızgara biftek</p>
+                                                        </div>
+                                                        <div class="flex items-center space-x-2">
+                                                            <span class="font-normal font-light text-[13px] whitespace-nowrap"><span>₺650,00</span></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="">
+                                    <div class="relative">
+                                        <div class="cursor-pointer">
+                                            <div class="bg-qrborder/0 border-none rounded-sm">
+                                                <div class="p-0 flex">
+                                                    <div class="w-[50%] aspect-[4/3] flex-shrink-0 relative">
+                                                        <img
+                                                            alt="Kuzu Kaburga"
+                                                            loading="lazy"
+                                                            width="1920"
+                                                            height="1080"
+                                                            decoding="async"
+                                                            data-nimg="1"
+                                                            class="w-full h-full object-cover rounded-sm"
+                                                            src="https://qrboxdev.b-cdn.net/imagelibrary/7891729687782888.webp?t=1733350735749"
+                                                            style="color: transparent;"
+                                                        />
+                                                        <div class="absolute top-1.5 right-1.5 flex flex-row gap-1.5"></div>
+                                                    </div>
+                                                    <div class="w-[50%] flex flex-col justify-between py-1.5 pl-2.5">
+                                                        <div>
+                                                            <div class="flex items-start space-x-2"><h3 class="text-sm font-normal line-clamp-1">Kuzu Kaburga</h3></div>
+                                                            <p class="text-[11px] mt-1 text-gray-400 text-gray-700 line-clamp-4 font-normal font-light">Özel baharatlı sosla marine edilmiş, yavaş pişirilmiş kuzu kaburga</p>
+                                                        </div>
+                                                        <div class="flex items-center space-x-2">
+                                                            <span class="font-normal font-light text-[13px] whitespace-nowrap"><span>₺580,00</span></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="">
+                                    <div class="relative">
+                                        <div class="cursor-pointer">
+                                            <div class="bg-qrborder/0 border-none rounded-sm">
+                                                <div class="p-0 flex">
+                                                    <div class="w-[50%] aspect-[4/3] flex-shrink-0 relative">
+                                                        <img
+                                                            alt="T-bone Steak"
+                                                            loading="lazy"
+                                                            width="1920"
+                                                            height="1080"
+                                                            decoding="async"
+                                                            data-nimg="1"
+                                                            class="w-full h-full object-cover rounded-sm"
+                                                            src="https://qrboxdev.b-cdn.net/imagelibrary/9461729687968396.webp?t=1733350747428"
+                                                            style="color: transparent;"
+                                                        />
+                                                        <div class="absolute top-1.5 right-1.5 flex flex-row gap-1.5"></div>
+                                                    </div>
+                                                    <div class="w-[50%] flex flex-col justify-between py-1.5 pl-2.5">
+                                                        <div>
+                                                            <div class="flex items-start space-x-2"><h3 class="text-sm font-normal line-clamp-1">T-bone Steak</h3></div>
+                                                            <p class="text-[11px] mt-1 text-gray-400 text-gray-700 line-clamp-4 font-normal font-light">Tender dana fileto ve kontra filetodan oluşan klasik T-bone steak</p>
+                                                        </div>
+                                                        <div class="flex items-center space-x-2">
+                                                            <span class="font-normal font-light text-[13px] whitespace-nowrap"><span>₺880,00</span></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="">
+                                    <div class="relative">
+                                        <div class="cursor-pointer">
+                                            <div class="bg-qrborder/0 border-none rounded-sm">
+                                                <div class="p-0 flex">
+                                                    <div class="w-[50%] aspect-[4/3] flex-shrink-0 relative">
+                                                        <img
+                                                            alt="Steak"
+                                                            loading="lazy"
+                                                            width="1920"
+                                                            height="1080"
+                                                            decoding="async"
+                                                            data-nimg="1"
+                                                            class="w-full h-full object-cover rounded-sm"
+                                                            src="https://qrboxdev.b-cdn.net/imagelibrary/3461736462557518.webp"
+                                                            style="color: transparent;"
+                                                        />
+                                                        <div class="absolute top-1.5 right-1.5 flex flex-row gap-1.5"></div>
+                                                    </div>
+                                                    <div class="w-[50%] flex flex-col justify-between py-1.5 pl-2.5">
+                                                        <div>
+                                                            <div class="flex items-start space-x-2"><h3 class="text-sm font-normal line-clamp-1">Steak</h3></div>
+                                                            <p class="text-[11px] mt-1 text-gray-400 text-gray-700 line-clamp-4 font-normal font-light">Kalın dilimlenmiş Wagyu şeritler</p>
+                                                        </div>
+                                                        <div class="flex items-center space-x-2">
+                                                            <span class="font-normal font-light text-[13px] whitespace-nowrap"><span>₺850,00 - 1.600,00</span></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="category-tatlilar">
+                            <div class="flex flex-col items-center mb-3 mt-3">
+                                <div class="bg-qrborder2 p-2 rounded-sm flex w-full items-center justify-center">
+                                    <p class="text-[14px] font-normal font-light tracking-wider text-center overflow-hidden text-ellipsis">Tatlılar</p>
+                                </div>
+                            </div>
+                            <div class="flex flex-row"></div>
+                            <div class="grid gap-2.5 grid-cols-1">
+                                <div class="">
+                                    <div class="relative">
+                                        <div class="cursor-pointer">
+                                            <div class="bg-qrborder/0 border-none rounded-sm">
+                                                <div class="p-0 flex">
+                                                    <div class="w-[50%] aspect-[4/3] flex-shrink-0 relative">
+                                                        <img
+                                                            alt="Izgara Uskumru"
+                                                            loading="lazy"
+                                                            width="1920"
+                                                            height="1080"
+                                                            decoding="async"
+                                                            data-nimg="1"
+                                                            class="w-full h-full object-cover rounded-sm"
+                                                            src="https://qrboxdev.b-cdn.net/imagelibrary/6441729516897880.webp?t=1733350754515"
+                                                            style="color: transparent;"
+                                                        />
+                                                        <div class="absolute top-1.5 right-1.5 flex flex-row gap-1.5"></div>
+                                                    </div>
+                                                    <div class="w-[50%] flex flex-col justify-between py-1.5 pl-2.5">
+                                                        <div>
+                                                            <div class="flex items-start space-x-2"><h3 class="text-sm font-normal line-clamp-1">Izgara Uskumru</h3></div>
+                                                            <p class="text-[11px] mt-1 text-gray-400 text-gray-700 line-clamp-4 font-normal font-light">Odun ateşinde ızgara edilmiş, baharatlı uskumru</p>
+                                                        </div>
+                                                        <div class="flex items-center space-x-2">
+                                                            <span class="font-normal font-light text-[13px] whitespace-nowrap"><span>₺280,00</span></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="">
+                                    <div class="relative">
+                                        <div class="cursor-pointer">
+                                            <div class="bg-qrborder/0 border-none rounded-sm">
+                                                <div class="p-0 flex">
+                                                    <div class="w-[50%] aspect-[4/3] flex-shrink-0 relative">
+                                                        <img
+                                                            alt="Hamsi Tava"
+                                                            loading="lazy"
+                                                            width="1920"
+                                                            height="1080"
+                                                            decoding="async"
+                                                            data-nimg="1"
+                                                            class="w-full h-full object-cover rounded-sm"
+                                                            src="https://qrboxdev.b-cdn.net/imagelibrary/3021729516485838.webp?t=1733350758517"
+                                                            style="color: transparent;"
+                                                        />
+                                                        <div class="absolute top-1.5 right-1.5 flex flex-row gap-1.5"></div>
+                                                    </div>
+                                                    <div class="w-[50%] flex flex-col justify-between py-1.5 pl-2.5">
+                                                        <div>
+                                                            <div class="flex items-start space-x-2"><h3 class="text-sm font-normal line-clamp-1">Hamsi Tava</h3></div>
+                                                            <p class="text-[11px] mt-1 text-gray-400 text-gray-700 line-clamp-4 font-normal font-light">Taze Karadeniz hamsisi, geleneksel tarifle tavada kızartılmış</p>
+                                                        </div>
+                                                        <div class="flex items-center space-x-2">
+                                                            <span class="font-normal font-light text-[13px] whitespace-nowrap"><span>₺240,00</span></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="">
+                                    <div class="relative">
+                                        <div class="cursor-pointer">
+                                            <div class="bg-qrborder/0 border-none rounded-sm">
+                                                <div class="p-0 flex">
+                                                    <div class="w-[50%] aspect-[4/3] flex-shrink-0 relative">
+                                                        <img
+                                                            alt="Istakoz"
+                                                            loading="lazy"
+                                                            width="1920"
+                                                            height="1080"
+                                                            decoding="async"
+                                                            data-nimg="1"
+                                                            class="w-full h-full object-cover rounded-sm"
+                                                            src="https://qrboxdev.b-cdn.net/imagelibrary/2291733179790469.webp?t=1733350765180"
+                                                            style="color: transparent;"
+                                                        />
+                                                        <div class="absolute top-1.5 right-1.5 flex flex-row gap-1.5"></div>
+                                                    </div>
+                                                    <div class="w-[50%] flex flex-col justify-between py-1.5 pl-2.5">
+                                                        <div>
+                                                            <div class="flex items-start space-x-2"><h3 class="text-sm font-normal line-clamp-1">Istakoz</h3></div>
+                                                            <p class="text-[11px] mt-1 text-gray-400 text-gray-700 line-clamp-4 font-normal font-light">Özel baharat ve tereyağı ile hazırlanmış taze ıstakoz</p>
+                                                        </div>
+                                                        <div class="flex items-center space-x-2">
+                                                            <span class="font-normal font-light text-[13px] whitespace-nowrap"><span>₺1.800,00</span></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="">
+                                    <div class="relative">
+                                        <div class="cursor-pointer">
+                                            <div class="bg-qrborder/0 border-none rounded-sm">
+                                                <div class="p-0 flex">
+                                                    <div class="w-[50%] aspect-[4/3] flex-shrink-0 relative">
+                                                        <img
+                                                            alt="Izgara Çipura"
+                                                            loading="lazy"
+                                                            width="1920"
+                                                            height="1080"
+                                                            decoding="async"
+                                                            data-nimg="1"
+                                                            class="w-full h-full object-cover rounded-sm"
+                                                            src="https://qrboxdev.b-cdn.net/imagelibrary/5831729516325713.webp?t=1733350769320"
+                                                            style="color: transparent;"
+                                                        />
+                                                        <div class="absolute top-1.5 right-1.5 flex flex-row gap-1.5"></div>
+                                                    </div>
+                                                    <div class="w-[50%] flex flex-col justify-between py-1.5 pl-2.5">
+                                                        <div>
+                                                            <div class="flex items-start space-x-2"><h3 class="text-sm font-normal line-clamp-1">Izgara Çipura</h3></div>
+                                                            <p class="text-[11px] mt-1 text-gray-400 text-gray-700 line-clamp-4 font-normal font-light">Akdeniz otları ile marine edilmiş, ızgara çipura</p>
+                                                        </div>
+                                                        <div class="flex items-center space-x-2">
+                                                            <span class="font-normal font-light text-[13px] whitespace-nowrap"><span>₺420,00</span></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="">
+                                    <div class="relative">
+                                        <div class="cursor-pointer">
+                                            <div class="bg-qrborder/0 border-none rounded-sm">
+                                                <div class="p-0 flex">
+                                                    <div class="w-[50%] aspect-[4/3] flex-shrink-0 relative">
+                                                        <img
+                                                            alt="Izgara Ahtapot"
+                                                            loading="lazy"
+                                                            width="1920"
+                                                            height="1080"
+                                                            decoding="async"
+                                                            data-nimg="1"
+                                                            class="w-full h-full object-cover rounded-sm"
+                                                            src="https://qrboxdev.b-cdn.net/imagelibrary/5021729517612273.webp?t=1733350777666"
+                                                            style="color: transparent;"
+                                                        />
+                                                        <div class="absolute top-1.5 right-1.5 flex flex-row gap-1.5"></div>
+                                                    </div>
+                                                    <div class="w-[50%] flex flex-col justify-between py-1.5 pl-2.5">
+                                                        <div>
+                                                            <div class="flex items-start space-x-2"><h3 class="text-sm font-normal line-clamp-1">Izgara Ahtapot</h3></div>
+                                                            <p class="text-[11px] mt-1 text-gray-400 text-gray-700 line-clamp-4 font-normal font-light">Zeytinyağı ve limon ile servis edilen ızgara edilmiş taze ahtapot</p>
+                                                        </div>
+                                                        <div class="flex items-center space-x-2">
+                                                            <span class="font-normal font-light text-[13px] whitespace-nowrap"><span>₺580,00</span></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="">
+                                    <div class="relative">
+                                        <div class="cursor-pointer">
+                                            <div class="bg-qrborder/0 border-none rounded-sm">
+                                                <div class="p-0 flex">
+                                                    <div class="w-[50%] aspect-[4/3] flex-shrink-0 relative">
+                                                        <img
+                                                            alt="Izgara Karides"
+                                                            loading="lazy"
+                                                            width="1920"
+                                                            height="1080"
+                                                            decoding="async"
+                                                            data-nimg="1"
+                                                            class="w-full h-full object-cover rounded-sm"
+                                                            src="https://qrboxdev.b-cdn.net/imagelibrary/7081729516669634.webp?t=1733350783775"
+                                                            style="color: transparent;"
+                                                        />
+                                                        <div class="absolute top-1.5 right-1.5 flex flex-row gap-1.5"></div>
+                                                    </div>
+                                                    <div class="w-[50%] flex flex-col justify-between py-1.5 pl-2.5">
+                                                        <div>
+                                                            <div class="flex items-start space-x-2"><h3 class="text-sm font-normal line-clamp-1">Izgara Karides</h3></div>
+                                                            <p class="text-[11px] mt-1 text-gray-400 text-gray-700 line-clamp-4 font-normal font-light">Limon ve otlarla ızgara edilmiş jumbo karides</p>
+                                                        </div>
+                                                        <div class="flex items-center space-x-2">
+                                                            <span class="font-normal font-light text-[13px] whitespace-nowrap"><span>₺480,00</span></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="md:min-w-[500px] max-w-[500px] fixed flex justify-center -bottom-1 bg-qrbackground z-[100] w-full h-6">
+                    <button
+                        class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 active:text-opacity-50 text-white active:text-opacity-50 text-black bg-none h-9 px-4 py-2 pb-6"
+                    >
+                        <img
+                            alt="Logo"
+                            loading="lazy"
+                            width="1920"
+                            height="1080"
+                            decoding="async"
+                            data-nimg="1"
+                            class="h-2.5 w-auto 0 block hidden"
+                            src="https://qrboxdev.b-cdn.net/qrbox/QRbox%20Light%20Logo.svg"
+                            style="color: transparent;"
+                        />
+                        <img
+                            alt="Logo"
+                            loading="lazy"
+                            width="1920"
+                            height="1080"
+                            decoding="async"
+                            data-nimg="1"
+                            class="h-2.5 w-auto 0 hidden block"
+                            src="https://qrboxdev.b-cdn.net/qrbox/QRbox%20Dark%20Logo.svg"
+                            style="color: transparent;"
+                        />
+                    </button>
+                </div>
+            </div>
         </div>
-      </article>
-      <article class="item">
-        <div class="item__thumb placeholder"></div>
-        <div class="item__body">
-          <div class="item__row">
-            <h3 class="item__title">Menemen</h3>
-            <div class="item__price">₺160.00</div>
-          </div>
-          <p class="item__desc">İçerik açıklaması (placeholder)</p>
-        </div>
-      </article>
-    </div>
-  </section>
-
-  <!-- Ana Yemekler -->
-  <section id="anayemek" class="section">
-    <div class="section__head">
-      <h2>Ana Yemekler</h2>
-      <a class="section__top" href="#top">Yukarı</a>
-    </div>
-    <p class="section__desc">Açıklama (placeholder)</p>
-
-    <div class="stack">
-      <article class="item">
-        <div class="item__thumb placeholder"></div>
-        <div class="item__body">
-          <div class="item__row">
-            <h3 class="item__title">Izgara Köfte</h3>
-            <div class="item__price">₺320.00</div>
-          </div>
-          <p class="item__desc">İçerik açıklaması (placeholder)</p>
-        </div>
-      </article>
-      <article class="item">
-        <div class="item__thumb placeholder"></div>
-        <div class="item__body">
-          <div class="item__row">
-            <h3 class="item__title">Tavuk Izgara</h3>
-            <div class="item__price">₺300.00</div>
-          </div>
-          <p class="item__desc">İçerik açıklaması (placeholder)</p>
-        </div>
-      </article>
-    </div>
-  </section>
-
-  <!-- Pizza -->
-  <section id="pizza" class="section">
-    <div class="section__head">
-      <h2>Pizza</h2>
-      <a class="section__top" href="#top">Yukarı</a>
-    </div>
-    <p class="section__desc">Açıklama (placeholder)</p>
-
-    <div class="stack">
-      <article class="item">
-        <div class="item__thumb placeholder"></div>
-        <div class="item__body">
-          <div class="item__row">
-            <h3 class="item__title">Margherita</h3>
-            <div class="item__price">₺260.00</div>
-          </div>
-          <p class="item__desc">İçerik açıklaması (placeholder)</p>
-        </div>
-      </article>
-      <article class="item">
-        <div class="item__thumb placeholder"></div>
-        <div class="item__body">
-          <div class="item__row">
-            <h3 class="item__title">Sucuklu</h3>
-            <div class="item__price">₺285.00</div>
-          </div>
-          <p class="item__desc">İçerik açıklaması (placeholder)</p>
-        </div>
-      </article>
-    </div>
-  </section>
-
-  <!-- İçecekler -->
-  <section id="icecek" class="section">
-    <div class="section__head">
-      <h2>İçecekler</h2>
-      <a class="section__top" href="#top">Yukarı</a>
-    </div>
-    <p class="section__desc">Açıklama (placeholder)</p>
-
-    <div class="stack">
-      <article class="item">
-        <div class="item__thumb placeholder"></div>
-        <div class="item__body">
-          <div class="item__row">
-            <h3 class="item__title">Çay</h3>
-            <div class="item__price">₺40.00</div>
-          </div>
-          <p class="item__desc">İçerik açıklaması (placeholder)</p>
-        </div>
-      </article>
-      <article class="item">
-        <div class="item__thumb placeholder"></div>
-        <div class="item__body">
-          <div class="item__row">
-            <h3 class="item__title">Türk Kahvesi</h3>
-            <div class="item__price">₺70.00</div>
-          </div>
-          <p class="item__desc">İçerik açıklaması (placeholder)</p>
-        </div>
-      </article>
-      <article class="item">
-        <div class="item__thumb placeholder"></div>
-        <div class="item__body">
-          <div class="item__row">
-            <h3 class="item__title">Ayran</h3>
-            <div class="item__price">₺45.00</div>
-          </div>
-          <p class="item__desc">İçerik açıklaması (placeholder)</p>
-        </div>
-      </article>
-    </div>
-  </section>
-
-  <footer class="footer">
-    © <span id="y"></span> Örnek Mekân • Mobil QR Menü
-  </footer>
-</main>
-
-<script>
-  document.getElementById('y').textContent = new Date().getFullYear();
-  document.documentElement.style.scrollBehavior = 'smooth';
-</script>
-</body>
+        <script src="./scripts/menu.js" defer></script> 
+    </body>
 </html>

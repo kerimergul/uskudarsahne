@@ -5612,3 +5612,97 @@ body {
   .footer-social a.facebook svg { color: #1877F2; } /* Facebook mavisi */
 .footer-social a.maps svg     { color: #EA4335; } /* Google kırmızısı */
 
+/* — Kategori şeridi sticky — */
+.scroll-area {
+    position: sticky !important;  /* inline relative'i ezer */
+    top: 0;
+    z-index: 2147483647;          /* en üstte */
+    background: var(--qrbackground, #fff);
+    overflow: visible !important; /* overflow-hidden'ı ezer, başlıklar kesilmesin */
+    transition: box-shadow .2s ease, background .2s ease;
+  }
+  
+  /* Aşağı kayarken kompakt mod */
+  .scroll-area.compact {
+    box-shadow: 0 6px 14px rgba(0,0,0,.08);
+  }
+  
+  /* — Yalnızca resim bloklarını kapat — */
+  .scroll-area.compact .h-\[84px\] {
+    display: none !important;
+  }
+  
+  /* Başlık bandı biraz sıkılaştırılsın (görünür kalsın) */
+  .scroll-area .p-1\.5 { transition: padding .18s ease; }
+  .scroll-area.compact .p-1\.5 {
+    padding-top: 6px !important;
+    padding-bottom: 6px !important;
+    /* arzu edersen arka planı netleştir: */
+    /* background: var(--qrbackground, #fff) !important; */
+  }
+  
+  /* Başlık yazısını küçült */
+  .scroll-area.compact h3,
+  .scroll-area.compact h3 p {
+    font-size: 12px !important;
+    line-height: 1.1 !important;
+  }
+  
+  /* Kutu alt boşluklarını toparla */
+  .scroll-area .w-\[109px\] { transition: margin .18s ease; }
+  .scroll-area.compact .w-\[109px\] { margin-bottom: 0 !important; }
+
+  /* — Kompakt kategori barı — */
+#compactCategoryBar{
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 500px;              /* sayfandaki container ile hizalı */
+    z-index: 2147483647;           /* en üstte */
+    background: var(--qrbackground, #fff);
+    border-bottom: 1px solid rgba(0,0,0,.08);
+    box-shadow: 0 6px 14px rgba(0,0,0,.06);
+    padding: 6px 8px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .18s ease, transform .18s ease;
+  }
+  
+  #compactCategoryBar.show{
+    opacity: 1;
+    pointer-events: auto;
+  }
+  
+  #compactCategoryBar .cc-track{
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    white-space: nowrap;
+  }
+  #compactCategoryBar .cc-track::-webkit-scrollbar{ display:none; }
+  
+  #compactCategoryBar .cc-pill{
+    font-size: 12px;
+    line-height: 1.1;
+    padding: 6px 10px;
+    border-radius: 9999px;
+    border: 1px solid rgba(0,0,0,.12);
+    background: rgba(0,0,0,.04);
+  }
+  
+  /* Bar görünürken üstteki içerik gizlenmesin diye küçük bir üst boşluk ekle */
+  html.has-compact-bar body{ padding-top: 40px; }
+  
+  @supports(padding: env(safe-area-inset-top)){
+    #compactCategoryBar{ padding-top: calc(6px + env(safe-area-inset-top)); }
+  }
+
+  #compactCategoryBar .cc-pill.active{
+    border-color: currentColor;
+    box-shadow: 0 0 0 1px currentColor inset;
+  }
+  

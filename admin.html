@@ -1,0 +1,487 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Basit Admin Panel (MongoDB Atlas + Cloudinary)</title>
+  <style>
+    :root { --bg:#0f1115; --card:#171923; --muted:#8b8fa3; --text:#e5e7f0; --accent:#60a5fa; --danger:#ef4444; --ok:#22c55e; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial; background:var(--bg); color:var(--text); }
+    header { display:flex; align-items:center; justify-content:space-between; padding:14px 16px; background:#0b0d12; border-bottom:1px solid #232633; position:sticky; top:0; z-index:10; }
+    header h1 { font-size:16px; margin:0; letter-spacing:.2px; }
+    header .status { font-size:12px; color:var(--muted); }
+    main { max-width:1100px; margin:0 auto; padding:20px; }
+    .grid { display:grid; grid-template-columns: 1fr; gap:16px; }
+    @media(min-width:920px){ .grid{ grid-template-columns: 1fr 1fr; } }
+    .card { background:var(--card); border:1px solid #232633; border-radius:14px; padding:16px; }
+    h2 { margin:0 0 12px; font-size:15px; letter-spacing:.2px; }
+    h3 { margin:12px 0 8px; font-size:13px; color:var(--muted); font-weight:600; text-transform:uppercase; letter-spacing:.8px; }
+    label { display:block; font-size:12px; color:var(--muted); margin:10px 0 6px; }
+    input, select, textarea { width:100%; padding:10px 12px; background:#0f1320; color:var(--text); border:1px solid #2a2f45; border-radius:10px; outline:none; }
+    textarea{ min-height:90px; resize:vertical; }
+    .row { display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
+    .btn { display:inline-flex; align-items:center; gap:8px; padding:10px 12px; border-radius:10px; border:1px solid transparent; background:#1b243b; color:#fff; cursor:pointer; font-weight:600; }
+    .btn:hover{ filter:brightness(1.05); }
+    .btn.primary { background: linear-gradient(180deg, #2563eb, #1d4ed8); }
+    .btn.ghost { background:transparent; border-color:#2a2f45; }
+    .btn.danger { background:#2a0f14; border-color:#5e1b27; color:#ffb4be; }
+    .stack { display:flex; gap:10px; flex-wrap:wrap; }
+    .list { display:flex; flex-direction:column; gap:10px; max-height:420px; overflow:auto; padding-right:4px; }
+    .item { display:flex; align-items:center; gap:12px; padding:10px; border:1px solid #232633; border-radius:12px; background:#101321; }
+    .thumb { width:56px; height:42px; border-radius:8px; object-fit:cover; background:#0c0f1b; border:1px solid #20263b; }
+    .muted { color:var(--muted); font-size:12px; }
+    .pill { font-size:11px; padding:3px 8px; border-radius:999px; background:#0f182c; border:1px solid #2a3553; color:#a6b4d6; }
+    .right { margin-left:auto; display:flex; gap:8px; }
+    .sep { height:1px; background:#232633; margin:16px 0; }
+    .note { font-size:12px; color:#aab; margin-top:8px; }
+    .error { color:#ffb4be; }
+    .success { color:#9be7b0; }
+    .hide { display:none !important; }
+    .toolbar { display:flex; gap:8px; align-items:center; }
+    .mini { font-size:11px; opacity:.9; }
+  </style>
+  <!-- MongoDB Realm Web SDK -->
+  <script src="https://unpkg.com/realm-web/dist/bundle.iife.js"></script>
+</head>
+<body>
+  <header>
+    <h1>Admin Panel · MongoDB Atlas</h1>
+    <div class="status" id="status">Bağlı değil</div>
+  </header>
+
+  <main>
+    <!-- LOGIN CARD -->
+    <section class="card" id="loginCard">
+      <h2>Giriş</h2>
+      <div class="row">
+        <div>
+          <label for="email">E‑posta</label>
+          <input id="email" type="email" placeholder="admin@site.com" />
+        </div>
+        <div>
+          <label for="password">Şifre</label>
+          <input id="password" type="password" placeholder="••••••••" />
+        </div>
+      </div>
+      <div class="stack" style="margin-top:12px;">
+        <button class="btn primary" id="btnLogin">Giriş yap</button>
+        <button class="btn ghost" id="btnLogout" disabled>Çıkış</button>
+        <span class="note">İlk kullanıcıyı <b>Atlas App Services</b> → Auth (Email/Password) ile oluşturun.</span>
+      </div>
+      <div id="loginMsg" class="note"></div>
+    </section>
+
+    <!-- APP CARD -->
+    <section class="grid hide" id="app">
+      <!-- KATEGORİLER -->
+      <div class="card">
+        <div class="toolbar" style="justify-content:space-between;">
+          <h2>Kategoriler</h2>
+          <button class="btn ghost mini" id="btnRefreshCats">Yenile</button>
+        </div>
+
+        <form id="catForm">
+          <input type="hidden" id="catId" />
+          <div class="row">
+            <div>
+              <label for="catName">İsim</label>
+              <input id="catName" required placeholder="Örn: Sıcak Kahveler" />
+            </div>
+            <div>
+              <label for="catType">Tür</label>
+              <select id="catType" required>
+                <option value="food">Yemek</option>
+                <option value="drink">İçecek</option>
+              </select>
+            </div>
+          </div>
+          <div class="row">
+            <div>
+              <label for="catImage">Görsel (JPG/PNG)</label>
+              <input id="catImage" type="file" accept="image/*" />
+            </div>
+            <div>
+              <label>Önizleme</label>
+              <img id="catPreview" class="thumb" alt="" />
+            </div>
+          </div>
+          <div class="stack" style="margin-top:12px;">
+            <button class="btn primary" type="submit" id="btnSaveCat">Kaydet</button>
+            <button class="btn ghost" type="button" id="btnResetCat">Temizle</button>
+          </div>
+          <div id="catMsg" class="note"></div>
+        </form>
+
+        <div class="sep"></div>
+
+        <div class="list" id="catList"></div>
+      </div>
+
+      <!-- ÜRÜNLER -->
+      <div class="card">
+        <div class="toolbar" style="justify-content:space-between;">
+          <h2>Ürünler</h2>
+          <button class="btn ghost mini" id="btnRefreshProds">Yenile</button>
+        </div>
+
+        <form id="prodForm">
+          <input type="hidden" id="prodId" />
+          <label for="prodName">İsim</label>
+          <input id="prodName" required placeholder="Örn: Latte" />
+
+          <label for="prodDesc">Açıklama</label>
+          <textarea id="prodDesc" placeholder="Kısa açıklama"></textarea>
+
+          <div class="row">
+            <div>
+              <label for="prodPrice">Fiyat (₺)</label>
+              <input id="prodPrice" type="number" step="0.01" min="0" required />
+            </div>
+            <div>
+              <label for="prodCategory">Kategori</label>
+              <select id="prodCategory" required></select>
+            </div>
+          </div>
+
+          <div class="row">
+            <div>
+              <label for="prodImage">Görsel</label>
+              <input id="prodImage" type="file" accept="image/*" />
+            </div>
+            <div>
+              <label>Önizleme</label>
+              <img id="prodPreview" class="thumb" alt="" />
+            </div>
+          </div>
+
+          <div class="stack" style="margin-top:12px;">
+            <button class="btn primary" type="submit" id="btnSaveProd">Kaydet</button>
+            <button class="btn ghost" type="button" id="btnResetProd">Temizle</button>
+          </div>
+          <div id="prodMsg" class="note"></div>
+        </form>
+
+        <div class="sep"></div>
+
+        <div class="list" id="prodList"></div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // === CONFIG ===
+    const APP_ID = "YOUR_REALM_APP_ID"; // App Services → App ID
+    const CLUSTER_SERVICE = "mongodb-atlas"; // Data Source name (genelde varsayılan)
+    const DB_NAME = "qrbox";
+    const CATS_COLLECTION = "categories";
+    const PRODS_COLLECTION = "products";
+
+    // CDN (Cloudinary) — hızlı başlangıç için. Prod'da imzalı yükleme/proxy önerilir.
+    const CLOUDINARY_CLOUD_NAME = "YOUR_CLOUD_NAME";
+    const CLOUDINARY_UPLOAD_PRESET = "YOUR_UNSIGNED_PRESET"; // Upload preset (unsigned), Cloudinary Dashboard'dan oluşturun ve kısıtlayın.
+
+    // === STATE ===
+    const { App, Credentials, BSON } = window.realm;
+    const app = new App({ id: APP_ID });
+    let user, mongo, db, Cats, Prods;
+
+    // === UTILS ===
+    const $ = sel => document.querySelector(sel);
+    const el = (tag, attrs={}, children=[]) => {
+      const n = document.createElement(tag);
+      Object.entries(attrs).forEach(([k,v]) => {
+        if(k === 'class') n.className = v; else if(k === 'text') n.textContent = v; else n.setAttribute(k, v);
+      });
+      children.forEach(c => n.append(c));
+      return n;
+    };
+    const fmt = n => new Intl.NumberFormat('tr-TR', { style:'currency', currency:'TRY' }).format(n||0);
+
+    function setStatus(txt){ $('#status').textContent = txt; }
+    function msg(node, type, text){ node.textContent = text; node.className = `note ${type}`; setTimeout(()=>{ node.textContent=''; node.className='note'; }, 2500); }
+
+    function filePreview(input, imgEl){
+      const f = input.files?.[0];
+      if(!f){ imgEl.src=''; return; }
+      const r = new FileReader();
+      r.onload = () => imgEl.src = r.result;
+      r.readAsDataURL(f);
+    }
+
+    async function uploadImageToCloudinary(file, folder){
+      if(!file) return null;
+      const fd = new FormData();
+      fd.append('file', file);
+      fd.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+      fd.append('folder', folder);
+      const url = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`;
+      const res = await fetch(url, { method:'POST', body: fd });
+      if(!res.ok){ throw new Error('Görsel yüklenemedi'); }
+      const data = await res.json();
+      return data.secure_url; // imageUrl
+    }
+
+    async function ensureConnected(){
+      if(!user) throw new Error('Oturum yok');
+      if(!Cats || !Prods){
+        mongo = user.mongoClient(CLUSTER_SERVICE);
+        db = mongo.db(DB_NAME);
+        Cats = db.collection(CATS_COLLECTION);
+        Prods = db.collection(PRODS_COLLECTION);
+      }
+    }
+
+    // === AUTH ===
+    async function login(){
+      const email = $('#email').value.trim();
+      const password = $('#password').value;
+      try{
+        user = await app.logIn(Credentials.emailPassword(email, password));
+        setStatus(`Giriş yapıldı: ${user.profile.email || email}`);
+        $('#loginMsg').textContent = '';
+        $('#btnLogout').disabled = false;
+        $('#loginCard').classList.add('hide');
+        $('#app').classList.remove('hide');
+        await ensureConnected();
+        await refreshCats();
+        await refreshProds();
+      }catch(err){
+        console.error(err);
+        msg($('#loginMsg'), 'error', err.message || 'Giriş başarısız');
+      }
+    }
+
+    async function logout(){
+      try{ await app.currentUser?.logOut(); }catch(_){ }
+      user = null; Cats = Prods = null;
+      setStatus('Bağlı değil');
+      $('#btnLogout').disabled = true;
+      $('#app').classList.add('hide');
+      $('#loginCard').classList.remove('hide');
+    }
+
+    // === CATEGORIES ===
+    async function refreshCats(){
+      await ensureConnected();
+      const cats = await Cats.find({}, { sort: { createdAt: -1 } });
+      const list = $('#catList');
+      list.innerHTML = '';
+      // dropdown for products
+      const catSelect = $('#prodCategory');
+      catSelect.innerHTML = '';
+      cats.forEach(c => {
+        // list item
+        const it = el('div', { class:'item' }, [
+          el('img', { class:'thumb', src: c.imageUrl || '', alt: '' }),
+          el('div', {}, [
+            el('div', { text: c.name }),
+            el('div', { class:'muted' , text: (c.type==='drink'?'İçecek':'Yemek') + ' · ' + (c.updatedAt? new Date(c.updatedAt).toLocaleString('tr-TR'): '') })
+          ]),
+          el('span', { class:'pill' , text: c._id.toString() }),
+          el('div', { class:'right' }, [
+            el('button', { class:'btn ghost mini', onclick: ()=>editCat(c) , type:'button' , text: 'Düzenle' }),
+            el('button', { class:'btn danger mini', onclick: ()=>deleteCat(c) , type:'button' , text: 'Sil' }),
+          ])
+        ]);
+        list.append(it);
+
+        // select option
+        const opt = document.createElement('option');
+        opt.value = c._id.toString();
+        opt.textContent = c.name;
+        catSelect.append(opt);
+      });
+    }
+
+    function resetCatForm(){
+      $('#catId').value = '';
+      $('#catName').value = '';
+      $('#catType').value = 'food';
+      $('#catImage').value = '';
+      $('#catPreview').src = '';
+      $('#btnSaveCat').textContent = 'Kaydet';
+    }
+
+    function editCat(c){
+      $('#catId').value = c._id.toString();
+      $('#catName').value = c.name;
+      $('#catType').value = c.type;
+      $('#catPreview').src = c.imageUrl || '';
+      $('#btnSaveCat').textContent = 'Güncelle';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    async function deleteCat(c){
+      await ensureConnected();
+      if(!confirm(`"${c.name}" kategorisini silmek istiyor musunuz?`)) return;
+      // ürün bağlı mı kontrol
+      const count = await Prods.count({ categoryId: c._id });
+      if(count>0){
+        alert(`Bu kategoriye bağlı ${count} ürün var. Önce ürünleri silin veya taşıyın.`);
+        return;
+      }
+      await Cats.deleteOne({ _id: c._id });
+      await refreshCats();
+    }
+
+    async function saveCat(e){
+      e.preventDefault();
+      await ensureConnected();
+      const idStr = $('#catId').value.trim();
+      const name = $('#catName').value.trim();
+      const type = $('#catType').value;
+      const file = $('#catImage').files?.[0] || null;
+      const msgNode = $('#catMsg');
+
+      if(!name){ return msg(msgNode, 'error', 'İsim gerekli'); }
+
+      try{
+        let imageUrl = $('#catPreview').src || '';
+        if(file){ imageUrl = await uploadImageToCloudinary(file, 'categories'); }
+        const now = new Date();
+
+        if(idStr){
+          const _id = new BSON.ObjectId(idStr);
+          const update = { name, type, updatedAt: now };
+          if(file) update.imageUrl = imageUrl;
+          await Cats.updateOne({ _id }, { $set: update });
+          msg(msgNode, 'success', 'Kategori güncellendi');
+        } else {
+          await Cats.insertOne({ name, type, imageUrl: imageUrl||'', createdAt: now, updatedAt: now });
+          msg(msgNode, 'success', 'Kategori eklendi');
+        }
+        resetCatForm();
+        await refreshCats();
+      }catch(err){
+        console.error(err);
+        msg(msgNode, 'error', err.message || 'İşlem başarısız');
+      }
+    }
+
+    // === PRODUCTS ===
+    async function refreshProds(){
+      await ensureConnected();
+      const prods = await Prods.find({}, { sort: { createdAt: -1 } });
+      const list = $('#prodList');
+      list.innerHTML = '';
+      for(const p of prods){
+        // kategori adı
+        let catName = '';
+        try{
+          const cat = await Cats.findOne({ _id: p.categoryId });
+          catName = cat?.name || '-';
+        }catch(_){ }
+        const it = el('div', { class:'item' }, [
+          el('img', { class:'thumb', src: p.imageUrl || '', alt:'' }),
+          el('div', {}, [
+            el('div', { text: p.name }),
+            el('div', { class:'muted', text: `${fmt(p.price)} · ${catName}` })
+          ]),
+          el('span', { class:'pill', text: p._id.toString() }),
+          el('div', { class:'right' }, [
+            el('button', { class:'btn ghost mini', onclick: ()=>editProd(p), type:'button', text:'Düzenle' }),
+            el('button', { class:'btn danger mini', onclick: ()=>deleteProd(p), type:'button', text:'Sil' }),
+          ])
+        ]);
+        list.append(it);
+      }
+    }
+
+    function resetProdForm(){
+      $('#prodId').value='';
+      $('#prodName').value='';
+      $('#prodDesc').value='';
+      $('#prodPrice').value='';
+      $('#prodCategory').value = $('#prodCategory').options[0]?.value || '';
+      $('#prodImage').value='';
+      $('#prodPreview').src='';
+      $('#btnSaveProd').textContent='Kaydet';
+    }
+
+    function editProd(p){
+      $('#prodId').value = p._id.toString();
+      $('#prodName').value = p.name;
+      $('#prodDesc').value = p.description || '';
+      $('#prodPrice').value = p.price;
+      $('#prodCategory').value = p.categoryId?.toString() || '';
+      $('#prodPreview').src = p.imageUrl || '';
+      $('#btnSaveProd').textContent='Güncelle';
+      window.scrollTo({ top: 0, behavior:'smooth' });
+    }
+
+    async function deleteProd(p){
+      await ensureConnected();
+      if(!confirm(`"${p.name}" ürününü silmek istiyor musunuz?`)) return;
+      await Prods.deleteOne({ _id: p._id });
+      await refreshProds();
+    }
+
+    async function saveProd(e){
+      e.preventDefault();
+      await ensureConnected();
+      const idStr = $('#prodId').value.trim();
+      const name = $('#prodName').value.trim();
+      const description = $('#prodDesc').value.trim();
+      const price = parseFloat($('#prodPrice').value);
+      const categoryIdStr = $('#prodCategory').value;
+      const file = $('#prodImage').files?.[0] || null;
+      const msgNode = $('#prodMsg');
+
+      if(!name || isNaN(price) || !categoryIdStr){ return msg(msgNode, 'error', 'Zorunlu alanları doldurun'); }
+
+      try{
+        let imageUrl = $('#prodPreview').src || '';
+        if(file){ imageUrl = await uploadImageToCloudinary(file, 'products'); }
+        const now = new Date();
+        const categoryId = new BSON.ObjectId(categoryIdStr);
+
+        if(idStr){
+          const _id = new BSON.ObjectId(idStr);
+          const update = { name, description, price, categoryId, updatedAt: now };
+          if(file) update.imageUrl = imageUrl;
+          await Prods.updateOne({ _id }, { $set: update });
+          msg(msgNode, 'success', 'Ürün güncellendi');
+        } else {
+          await Prods.insertOne({ name, description, price, categoryId, imageUrl: imageUrl||'', createdAt: now, updatedAt: now });
+          msg(msgNode, 'success', 'Ürün eklendi');
+        }
+        resetProdForm();
+        await refreshProds();
+      }catch(err){
+        console.error(err);
+        msg(msgNode, 'error', err.message || 'İşlem başarısız');
+      }
+    }
+
+    // === EVENTS ===
+    $('#btnLogin').addEventListener('click', login);
+    $('#btnLogout').addEventListener('click', logout);
+
+    $('#catImage').addEventListener('change', ()=>filePreview($('#catImage'), $('#catPreview')));
+    $('#prodImage').addEventListener('change', ()=>filePreview($('#prodImage'), $('#prodPreview')));
+
+    $('#catForm').addEventListener('submit', saveCat);
+    $('#btnResetCat').addEventListener('click', resetCatForm);
+    $('#btnRefreshCats').addEventListener('click', refreshCats);
+
+    $('#prodForm').addEventListener('submit', saveProd);
+    $('#btnResetProd').addEventListener('click', resetProdForm);
+    $('#btnRefreshProds').addEventListener('click', refreshProds);
+
+    // Sayfa yenilense de oturumu hatırla
+    (async function init(){
+      if(app.currentUser){
+        user = app.currentUser;
+        setStatus(`Giriş yapıldı: ${user.profile.email || user.id}`);
+        $('#btnLogout').disabled = false;
+        $('#loginCard').classList.add('hide');
+        $('#app').classList.remove('hide');
+        await ensureConnected();
+        await refreshCats();
+        await refreshProds();
+      }
+    })();
+  </script>
+</body>
+</html>
