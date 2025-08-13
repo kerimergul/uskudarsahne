@@ -18,9 +18,8 @@
     header{
       position:sticky; top:0; z-index:20;
       background:#0b0d12; border-bottom:1px solid var(--stroke);
-      height:56px;
-      display:flex; align-items:center; justify-content:center;
-      padding:0 16px;
+      height:56px; display:flex; align-items:center; justify-content:center;
+      padding:0 max(16px, env(safe-area-inset-right)) 0 max(16px, env(safe-area-inset-left));
     }
     header h1{ margin:0; font-size:16px; letter-spacing:.2px; text-align:center; }
     .hdr-actions{
@@ -34,12 +33,22 @@
     .btn.danger{ background:#2a0f14; border-color:#5e1b27; color:#ffb4be; }
     .mini{ font-size:12px; padding:7px 10px; }
 
+    /* MENU BUTTON (mobile) */
+    #btnMenu{
+      position:absolute; left:12px; top:8px; height:40px; width:40px;
+      display:none; align-items:center; justify-content:center;
+      border-radius:10px; border:1px solid var(--stroke); background:transparent; color:#d6daf0; cursor:pointer;
+    }
+    #btnMenu:hover{ background:#12192a; }
+
     /* LAYOUT */
     .wrap{ display:flex; min-height:calc(100vh - 56px); }
     .sidebar{
       position:sticky; top:56px; height:calc(100vh - 56px);
       width:230px; background:var(--sidebar); border-right:1px solid var(--stroke);
       padding:14px 10px; display:flex; flex-direction:column; gap:10px;
+      transition: transform .25s ease;
+      z-index:21; /* header(20)’nin üstünde kalsın */
     }
     .brand{ color:#aab4d6; font-weight:700; font-size:13px; letter-spacing:.6px; padding:8px 10px; opacity:.8; }
     .nav-item{
@@ -49,9 +58,7 @@
     .nav-item:hover{ background:#12192a; }
     .nav-item.active{ background:#16213a; border-color:#2a3553; color:#a6c4ff; }
 
-    .main{
-      flex:1; padding:20px; min-width:0;
-    }
+    .main{ flex:1; padding:20px; min-width:0; }
 
     .card{ background:var(--card); border:1px solid var(--stroke); border-radius:14px; padding:16px; }
     .toolrow{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
@@ -91,11 +98,43 @@
     .row + .row{ margin-top:10px; }
     label{ display:block; font-size:12px; color:var(--muted); margin:10px 0 6px; }
 
+    /* Sidebar backdrop (mobile) */
+    .sb-backdrop{ display:none; }
+
     .hide{ display:none !important; }
+
+    /* ====== RESPONSIVE ====== */
+    @media (max-width: 1024px){
+      .grid-cards{ grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); }
+    }
+    @media (max-width: 920px){
+      #btnMenu{ display:inline-flex; }
+      header h1{ max-width:60%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+      .wrap{ display:block; }
+      .main{ padding:16px; }
+
+      /* Sidebar off-canvas */
+      .sidebar{
+        position:fixed; left:0; top:56px; height:calc(100svh - 56px);
+        width:min(86vw, 300px); transform:translateX(-100%);
+      }
+      .sidebar.show{ transform:translateX(0); }
+      .sb-backdrop{
+        display:none; position:fixed; inset:56px 0 0 0; background:rgba(0,0,0,.5); z-index:19;
+      }
+      body.sidebar-open .sb-backdrop{ display:block; }
+
+      /* Forms & grid */
+      .row{ grid-template-columns: 1fr; }
+      .toolrow .grow{ min-width:140px; }
+      .grid-cards{ grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+    }
   </style>
 </head>
 <body>
   <header>
+    <button id="btnMenu" aria-label="Menü" title="Menü">☰</button>
     <h1>Admin Panel · Üsküdar Sahne</h1>
     <div class="hdr-actions">
       <span id="status">Bağlı değil</span>
@@ -104,6 +143,9 @@
   </header>
 
   <div class="wrap">
+    <!-- Sidebar backdrop (mobile) -->
+    <div class="sb-backdrop" id="sbBackdrop"></div>
+
     <!-- SIDEBAR -->
     <aside class="sidebar" id="sidebar" hidden>
       <div class="brand">Yönetim</div>
@@ -114,7 +156,6 @@
 
     <!-- MAIN -->
     <main class="main">
-
       <!-- LOGIN -->
       <section class="card centered" id="loginCard">
         <h2 style="margin:0 0 12px;">Giriş</h2>
@@ -136,8 +177,6 @@
 
       <!-- APP PANELS -->
       <section id="app" class="hide">
-
-        <!-- PANELS: common topbar + grid -->
         <div class="card">
           <div class="toolrow">
             <input class="grow" type="search" id="searchInput" placeholder="İsme göre ara…" />
@@ -146,12 +185,11 @@
           <div id="infoMsg" class="note"></div>
           <div class="grid-cards" id="grid"></div>
         </div>
-
       </section>
     </main>
   </div>
 
-  <!-- MODAL (Create/Update) -->
+  <!-- MODAL -->
   <div class="modal" id="modal">
     <div class="backdrop" data-close></div>
     <div class="sheet">
@@ -209,14 +247,14 @@
   </div>
 
   <script>
-    // ===== CONFIG (Node backend + BunnyCDN) =====
+    // ===== CONFIG (Node backend + BunnyCDN endpoints) =====
     const API_BASE = ""; // aynı origin
     const EP = {
       login:      API_BASE + "/api/auth/login",
       logout:     API_BASE + "/api/auth/logout",
       cats:       API_BASE + "/api/admin/categories",
       prods:      API_BASE + "/api/admin/products",
-      events:     API_BASE + "/api/admin/events",   // varsayım
+      events:     API_BASE + "/api/admin/events",   // opsiyonel
       upCat:  id => API_BASE + `/api/admin/upload/categories/${id}`,
       upProd: id => API_BASE + `/api/admin/upload/products/${id}`,
       upEvent:id => API_BASE + `/api/admin/upload/events/${id}`,
@@ -274,7 +312,21 @@
 
     $('#btnLogout').addEventListener('click', async ()=>{
       try{ await http('POST', EP.logout); }catch(_){}
-      location.reload(); // basit temiz başlangıç
+      location.reload();
+    });
+
+    // ===== SIDEBAR TOGGLE (mobile) =====
+    const closeSidebar = ()=>{
+      document.body.classList.remove('sidebar-open');
+      $('#sidebar').classList.remove('show');
+    };
+    $('#btnMenu').addEventListener('click', ()=>{
+      document.body.classList.toggle('sidebar-open');
+      $('#sidebar').classList.toggle('show');
+    });
+    $('#sbBackdrop').addEventListener('click', closeSidebar);
+    window.addEventListener('resize', ()=>{
+      if(window.innerWidth > 920){ closeSidebar(); }
     });
 
     // ===== NAV =====
@@ -285,6 +337,7 @@
         TAB = btn.dataset.tab;
         $('#searchInput').value = '';
         FILTER = '';
+        closeSidebar(); // mobilde seçimden sonra kapat
         render();
       });
     });
@@ -311,11 +364,10 @@
 
       // alan görünürlükleri
       $('#slotType').classList.toggle('hide', TAB!=='cats');
-      $('#slotDesc').classList.toggle('hide', TAB==='cats'); // ürün & etkinlik için açıklama
-      $('#slotPrice').classList.toggle('hide', TAB!=='prods'); // sadece ürünlerde fiyat+kategori
+      $('#slotDesc').classList.toggle('hide', TAB==='cats');
+      $('#slotPrice').classList.toggle('hide', TAB!=='prods');
 
       if(TAB==='prods'){
-        // kategori combobox
         const cats = DATA.cats || [];
         cats.forEach(c=>{
           const o = document.createElement('option');
@@ -350,7 +402,6 @@
       $('#formMsg').textContent = '';
       $('#modal').classList.add('show');
     }
-    $('[data-close]').addEventListener('click', ()=> $('#modal').classList.remove('show'));
     document.querySelectorAll('[data-close]').forEach(n=> n.addEventListener('click', ()=> $('#modal').classList.remove('show')));
     $('#formImage').addEventListener('change', ()=>{
       const f = $('#formImage').files?.[0]; if(!f){ $('#formPreview').src=''; return; }
@@ -404,50 +455,29 @@
     // ===== LOADERS =====
     async function loadAll(){
       $('#infoMsg').textContent = '';
-      try{
-        DATA.cats = await http('GET', EP.cats);
-      }catch(err){ $('#infoMsg').textContent = 'Kategoriler yüklenemedi: ' + err.message; }
-      try{
-        DATA.prods = await http('GET', EP.prods);
-      }catch(err){ $('#infoMsg').textContent = 'Ürünler yüklenemedi: ' + err.message; }
-      try{
-        DATA.events = await http('GET', EP.events);
-      }catch(err){
-        // Etkinlik backend yoksa kibar bildirim
-        $('#infoMsg').textContent = 'Etkinlikler henüz hazır değil.';
-        DATA.events = [];
-      }
+      try{ DATA.cats = await http('GET', EP.cats); }catch(err){ $('#infoMsg').textContent = 'Kategoriler yüklenemedi: ' + err.message; }
+      try{ DATA.prods = await http('GET', EP.prods); }catch(err){ $('#infoMsg').textContent = 'Ürünler yüklenemedi: ' + err.message; }
+      try{ DATA.events = await http('GET', EP.events); }catch(_){ DATA.events = []; }
     }
     async function reloadCurrent(){
       if(TAB==='cats') DATA.cats = await http('GET', EP.cats);
       else if(TAB==='prods') DATA.prods = await http('GET', EP.prods);
-      else {
-        try{ DATA.events = await http('GET', EP.events); }catch(_){ DATA.events=[]; }
-      }
+      else { try{ DATA.events = await http('GET', EP.events); }catch(_){ DATA.events=[]; } }
     }
 
     // ===== RENDER =====
-    function render(){
-      // üst bar placeholder reset
-      $('#infoMsg').textContent = '';
-      renderGrid();
-    }
-
+    function render(){ $('#infoMsg').textContent = ''; renderGrid(); }
     function filtered(list){
       if(!FILTER) return list;
       const f = FILTER;
       return (list||[]).filter(x => (x.name||'').toLowerCase().includes(f));
     }
-
     function renderGrid(){
       const grid = $('#grid'); grid.innerHTML = '';
       let list = TAB==='cats' ? DATA.cats : TAB==='prods' ? DATA.prods : DATA.events;
       list = filtered(list);
 
-      if(list.length===0){
-        grid.innerHTML = `<div class="note">Kayıt bulunamadı.</div>`;
-        return;
-      }
+      if(list.length===0){ grid.innerHTML = `<div class="note">Kayıt bulunamadı.</div>`; return; }
 
       const toCard = (obj)=>{
         const img = obj.images?.w640 || obj.imageUrl || '';
@@ -471,14 +501,10 @@
         });
         return card;
       };
-
       list.forEach(o=> grid.append(toCard(o)));
     }
 
-    // ===== BOOT =====
-    // Otomatik login YOK (istenmedi)
-    // Sayfa ilk açılışta sadece login ekranı görünür.
-    // Login sonrası sidebar+app görünür ve veriler yüklenir.
+    // Otomatik login YOK (bilerek).
   </script>
 </body>
 </html>
