@@ -14,6 +14,7 @@
     html,body{ height:100%; }
     body{ margin:0; background:var(--bg); color:var(--text); font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial; }
 
+    /* HEADER */
     header{
       position:sticky; top:0; z-index:20;
       background:#0b0d12; border-bottom:1px solid var(--stroke);
@@ -21,8 +22,10 @@
       padding:0 max(16px, env(safe-area-inset-right)) 0 max(16px, env(safe-area-inset-left));
     }
     header h1{ margin:0; font-size:16px; letter-spacing:.2px; text-align:center; }
-    .hdr-actions{ position:absolute; right:12px; top:0; height:56px; display:flex; align-items:center; gap:8px; color:var(--muted); font-size:12px; }
-
+    .hdr-actions{
+      position:absolute; right:12px; top:0; height:56px;
+      display:flex; align-items:center; gap:8px; color:var(--muted); font-size:12px;
+    }
     .btn{ display:inline-flex; align-items:center; gap:8px; padding:9px 12px; border-radius:10px; border:1px solid transparent; background:var(--hover); color:#fff; cursor:pointer; font-weight:600; }
     .btn:hover{ filter:brightness(1.05); }
     .btn.primary{ background: linear-gradient(180deg, #2563eb, #1d4ed8); }
@@ -31,18 +34,28 @@
     .btn[disabled]{ opacity:.5; cursor:not-allowed; }
     .mini{ font-size:12px; padding:7px 10px; }
 
-    #btnMenu{ position:absolute; left:12px; top:8px; height:40px; width:40px; display:none; align-items:center; justify-content:center; border-radius:10px; border:1px solid var(--stroke); background:transparent; color:#d6daf0; cursor:pointer; }
+    /* MENU BUTTON (mobile) */
+    #btnMenu{
+      position:absolute; left:12px; top:8px; height:40px; width:40px;
+      display:none; align-items:center; justify-content:center;
+      border-radius:10px; border:1px solid var(--stroke); background:transparent; color:#d6daf0; cursor:pointer;
+    }
     #btnMenu:hover{ background:#12192a; }
 
+    /* LAYOUT */
     .wrap{ display:flex; min-height:calc(100vh - 56px); }
     .sidebar{
       position:sticky; top:56px; height:calc(100vh - 56px);
       width:230px; background:var(--sidebar); border-right:1px solid var(--stroke);
       padding:14px 10px; display:flex; flex-direction:column; gap:10px;
-      transition: transform .25s ease; z-index:21;
+      transition: transform .25s ease;
+      z-index:21;
     }
     .brand{ color:#aab4d6; font-weight:700; font-size:13px; letter-spacing:.6px; padding:8px 10px; opacity:.8; }
-    .nav-item{ width:100%; text-align:left; background:transparent; border:1px solid var(--stroke); color:#d6daf0; padding:10px 12px; border-radius:10px; cursor:pointer; font-weight:600; }
+    .nav-item{
+      width:100%; text-align:left; background:transparent; border:1px solid var(--stroke);
+      color:#d6daf0; padding:10px 12px; border-radius:10px; cursor:pointer; font-weight:600;
+    }
     .nav-item:hover{ background:#12192a; }
     .nav-item.active{ background:#16213a; border-color:#2a3553; color:#a6c4ff; }
 
@@ -55,17 +68,29 @@
       width:100%; padding:10px 12px; background:#0f1320; color:var(--text); border:1px solid #2a2f45; border-radius:10px; outline:none;
     }
     .note{ font-size:12px; color:#aab; margin-top:8px; }
-    .titlebar{ font-size:15px; font-weight:700; margin-bottom:8px; }
+    .error{ color:#ffb4be; }
+    .success{ color:#9be7b0; }
 
-    .grid-cards{ display:grid; gap:12px; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); margin-top:12px; }
-    .itm{ background:#101321; border:1px solid var(--stroke); border-radius:12px; cursor:pointer; overflow:hidden; display:flex; flex-direction:column; }
+    /* GRID */
+    .grid-cards{
+      display:grid; gap:12px;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      margin-top:12px;
+    }
+    .itm{
+      background:#101321; border:1px solid var(--stroke); border-radius:12px; cursor:pointer; overflow:hidden;
+      display:flex; flex-direction:column;
+    }
     .itm:hover{ border-color:#2a3553; background:#12182a; }
     .thumb{ width:100%; aspect-ratio: 16/10; object-fit:cover; background:#0c0f1b; border-bottom:1px solid var(--stroke); }
     .itm-body{ padding:10px; display:flex; flex-direction:column; gap:6px; }
+    .title{ font-weight:700; font-size:14px; }
     .muted{ color:var(--muted); font-size:12px; }
 
+    /* LOGIN CARD */
     .centered{ max-width:520px; margin:20px auto; }
 
+    /* MODAL */
     .modal{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:50; }
     .modal.show{ display:flex; }
     .backdrop{ position:absolute; inset:0; background:rgba(0,0,0,.55); }
@@ -74,19 +99,35 @@
     .row + .row{ margin-top:10px; }
     label{ display:block; font-size:12px; color:var(--muted); margin:10px 0 6px; }
 
+    /* Sidebar backdrop (mobile) */
     .sb-backdrop{ display:none; }
+
     .hide{ display:none !important; }
 
-    @media (max-width: 1024px){ .grid-cards{ grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); } }
+    /* ====== RESPONSIVE ====== */
+    @media (max-width: 1024px){
+      .grid-cards{ grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); }
+    }
     @media (max-width: 920px){
       #btnMenu{ display:inline-flex; }
       header h1{ max-width:60%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-      .wrap{ display:block; } .main{ padding:16px; }
-      .sidebar{ position:fixed; left:0; top:56px; height:calc(100svh - 56px); width:min(86vw, 300px); transform:translateX(-100%); }
+
+      .wrap{ display:block; }
+      .main{ padding:16px; }
+
+      .sidebar{
+        position:fixed; left:0; top:56px; height:calc(100svh - 56px);
+        width:min(86vw, 300px); transform:translateX(-100%);
+      }
       .sidebar.show{ transform:translateX(0); }
-      .sb-backdrop{ display:none; position:fixed; inset:56px 0 0 0; background:rgba(0,0,0,.5); z-index:19; }
+      .sb-backdrop{
+        display:none; position:fixed; inset:56px 0 0 0; background:rgba(0,0,0,.5); z-index:19;
+      }
       body.sidebar-open .sb-backdrop{ display:block; }
-      .row{ grid-template-columns: 1fr; } .toolrow .grow{ min-width:140px; } .grid-cards{ grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+
+      .row{ grid-template-columns: 1fr; }
+      .toolrow .grow{ min-width:140px; }
+      .grid-cards{ grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
     }
   </style>
 </head>
@@ -101,8 +142,10 @@
   </header>
 
   <div class="wrap">
+    <!-- Sidebar backdrop (mobile) -->
     <div class="sb-backdrop" id="sbBackdrop"></div>
 
+    <!-- SIDEBAR -->
     <aside class="sidebar" id="sidebar" hidden>
       <div class="brand">Yönetim</div>
       <button class="nav-item active" data-tab="cats">Kategoriler</button>
@@ -110,6 +153,7 @@
       <button class="nav-item" data-tab="events">Etkinlikler</button>
     </aside>
 
+    <!-- MAIN -->
     <main class="main">
       <!-- LOGIN -->
       <section class="card centered" id="loginCard">
@@ -133,10 +177,10 @@
       <!-- APP PANELS -->
       <section id="app" class="hide">
         <div class="card">
-          <div id="pageTitle" class="titlebar">Kategoriler</div>
+          <h2 id="dashTitle" style="margin:0 0 10px;">Kategoriler</h2>
           <div class="toolrow">
             <input class="grow" type="search" id="searchInput" placeholder="İsme göre ara…" />
-            <button class="btn primary" id="btnAdd">+ Ekle</button>
+            <button class="btn primary" id="btnAdd" disabled>+ Ekle</button>
           </div>
           <div id="infoMsg" class="note"></div>
           <div class="grid-cards" id="grid"></div>
@@ -158,8 +202,8 @@
             <input id="formName" required />
           </div>
           <div id="slotType" class="hide">
-            <label for="formKind">Tür</label>
-            <select id="formKind">
+            <label for="formType">Tür</label>
+            <select id="formType">
               <option value="food">Yemek</option>
               <option value="drink">İçecek</option>
             </select>
@@ -195,7 +239,7 @@
 
         <div class="toolrow" style="margin-top:12px; justify-content:flex-end;">
           <button class="btn ghost" type="button" data-close>Kapat</button>
-          <button class="btn primary" id="btnSave" type="submit" disabled>Kaydet</button>
+          <button class="btn primary" type="submit" id="btnSave" disabled>Kaydet</button>
         </div>
         <div id="formMsg" class="note"></div>
       </form>
@@ -204,40 +248,26 @@
 
   <script>
     // ===== CONFIG =====
-    const API_BASE = "http://localhost:4000"; // aynı origin. Gerekirse: 
+    // TODO: burayı kendi API domaininle güncelle:
+    const API_BASE = "https://uskudarsahne-api.onrender.com";
     const EP = {
-      login:      API_BASE + "/api/auth/login",
-      logout:     API_BASE + "/api/auth/logout",
-      me:         API_BASE + "/api/auth/me",
-
-      // Admin (lazy fetch)
-      cats:       API_BASE + "/api/admin/categories",
-      prods:      API_BASE + "/api/admin/products",
-      events:     API_BASE + "/api/admin/events",
-
-      // CRUD
+      login:  API_BASE + "/api/auth/login",
+      logout: API_BASE + "/api/auth/logout",
+      me:     API_BASE + "/api/auth/me",
+      cats:   API_BASE + "/api/admin/categories",
+      prods:  API_BASE + "/api/admin/products",
+      events: API_BASE + "/api/admin/events",
       upCat:  id => API_BASE + `/api/admin/upload/categories/${id}`,
       upProd: id => API_BASE + `/api/admin/upload/products/${id}`,
       upEvent:id => API_BASE + `/api/admin/upload/events/${id}`,
-
-      postCat:    API_BASE + "/api/admin/categories",
-      postProd:   API_BASE + "/api/admin/products",
-      postEvent:  API_BASE + "/api/admin/events",
-      putCat: id => API_BASE + `/api/admin/categories/${id}`,
-      putProd:id => API_BASE + `/api/admin/products/${id}`,
-      putEvent:id => API_BASE + `/api/admin/events/${id}`,
-      delCat: id => API_BASE + `/api/admin/categories/${id}`,
-      delProd:id => API_BASE + `/api/admin/products/${id}`,
-      delEvent:id => API_BASE + `/api/admin/events/${id}`,
     };
 
     // ===== STATE =====
     const $ = s => document.querySelector(s);
-    let TAB = "cats"; // cats | prods | events
-    let DATA = { cats:null, prods:null, events:null }; // her sekmede fetch edilecek
+    let TAB = "cats";           // cats | prods | events
+    let DATA = { cats:[], prods:[], events:[] };
     let FILTER = "";
-    let ORIG = null; // modal'da karşılaştırma için orijinal obje
-    let FILE_CHANGED = false;
+    let FORM_SNAPSHOT = null;   // modal ilk hali
 
     // ===== HELPERS =====
     function setStatus(t){ $('#status').textContent = t; }
@@ -263,6 +293,10 @@
       return ct.includes('application/json') ? res.json() : res.text();
     }
 
+    function dashTitle(){
+      return TAB==='cats' ? 'Kategoriler' : TAB==='prods' ? 'Ürünler' : 'Etkinlikler';
+    }
+
     // ===== AUTH =====
     $('#btnLogin').addEventListener('click', async ()=>{
       const username = $('#username').value.trim();
@@ -270,7 +304,15 @@
       $('#loginMsg').textContent = '';
       try{
         await http('POST', EP.login, { username, password });
-        onLoggedIn(username);
+        $('#btnLogout').hidden = false;
+        $('#sidebar').hidden = false;
+        hide($('#loginCard')); show($('#app'));
+        setStatus(`Giriş yapıldı: ${username}`);
+        $('#dashTitle').textContent = dashTitle();
+        // Butonlar
+        $('#btnAdd').disabled = false;
+        await reloadCurrent();
+        render();
       }catch(err){
         if(err.message==='401'){ $('#loginMsg').textContent='Hatalı kullanıcı adı/şifre'; }
         else $('#loginMsg').textContent = err.message||'Giriş başarısız';
@@ -278,30 +320,31 @@
       }
     });
 
-    function onLoggedIn(name){
-      $('#btnLogout').hidden = false;
-      $('#sidebar').hidden = false;
-      hide($('#loginCard')); show($('#app'));
-      setStatus(`Giriş yapıldı: ${name||''}`);
-      loadCurrent();
-    }
-
     $('#btnLogout').addEventListener('click', async ()=>{
       try{ await http('POST', EP.logout); }catch(_){}
       location.reload();
     });
 
-    // Sayfa açılışında session varsa loginli kalsın
+    // BOOT: aktif session var mı?
     (async function boot(){
       try{
         const me = await http('GET', EP.me);
         if(me.loggedIn){
-          onLoggedIn(me.user?.username || 'admin');
+          $('#btnLogout').hidden = false;
+          $('#sidebar').hidden = false;
+          hide($('#loginCard')); show($('#app'));
+          setStatus(`Giriş yapıldı: ${me.user?.username || 'admin'}`);
+          $('#dashTitle').textContent = dashTitle();
+          $('#btnAdd').disabled = false;
+          await reloadCurrent();
+          render();
+          return;
         }
       }catch(_){}
+      setStatus('Bağlı değil');
     })();
 
-    // ===== SIDEBAR =====
+    // ===== SIDEBAR TOGGLE (mobile) =====
     const closeSidebar = ()=>{
       document.body.classList.remove('sidebar-open');
       $('#sidebar').classList.remove('show');
@@ -313,132 +356,127 @@
     $('#sbBackdrop').addEventListener('click', closeSidebar);
     window.addEventListener('resize', ()=>{ if(window.innerWidth > 920){ closeSidebar(); } });
 
-    // Sekme değişimi
+    // ===== NAV =====
     document.querySelectorAll('.nav-item').forEach(btn=>{
       btn.addEventListener('click', async ()=>{
         document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
         btn.classList.add('active');
         TAB = btn.dataset.tab;
-        $('#pageTitle').textContent = TAB==='cats'?'Kategoriler':TAB==='prods'?'Ürünler':'Etkinlikler';
+        $('#dashTitle').textContent = dashTitle();
         $('#searchInput').value = '';
         FILTER = '';
         closeSidebar();
-        await loadCurrent(true);
+        await reloadCurrent(); // sadece seçili sekmeyi çek
+        render();
       });
     });
 
     // ===== SEARCH =====
-    $('#searchInput').addEventListener('input', (e)=>{ FILTER = e.target.value.toLowerCase().trim(); renderGrid(); });
+    $('#searchInput').addEventListener('input', (e)=>{
+      FILTER = e.target.value.toLowerCase().trim();
+      renderGrid();
+    });
 
-    // ===== DATA LOAD (lazy) =====
-    async function loadCurrent(force=false){
-      const t = TAB;
-      $('#infoMsg').textContent = '';
-      try{
-        if(force || DATA[t] == null){
-          if(t==='cats') DATA.cats = await http('GET', EP.cats);
-          else if(t==='prods') DATA.prods = await http('GET', EP.prods);
-          else DATA.events = await http('GET', EP.events);
-        }
-        renderGrid();
-      }catch(err){
-        $('#infoMsg').textContent = 'Veri yüklenemedi: ' + err.message;
+    // ===== ADD BUTTON -> MODAL =====
+    $('#btnAdd').addEventListener('click', ()=> openModalForCreate());
+
+    // ===== MODAL =====
+    const saveBtn = $('#btnSave');
+
+    function snapshotForm(){
+      return {
+        id:  $('#formId').value.trim(),
+        name: $('#formName').value.trim(),
+        desc: $('#formDesc').value.trim(),
+        price: $('#formPrice').value.trim(),
+        cat: $('#formCategory').value,
+        type: $('#formType').value,
+        fileSelected: !!($('#formImage').files?.[0])
+      };
+    }
+    function hasChanged(a,b){
+      // fileSelected hariç tüm alanları kıyasla, ardından dosya seçimini ayrıca kontrol et
+      const A = { ...a }; const B = { ...b };
+      const fsA = !!A.fileSelected; const fsB = !!B.fileSelected;
+      delete A.fileSelected; delete B.fileSelected;
+      return JSON.stringify(A) !== JSON.stringify(B) || fsB; // yeni dosya => değişti kabul
+    }
+    function validateForm(){
+      const s = snapshotForm();
+      if(TAB==='cats'){
+        return !!s.name && (s.type==='food' || s.type==='drink');
       }
+      if(TAB==='prods'){
+        return !!s.name && !!s.cat && s.price !== '' && !isNaN(parseFloat(s.price));
+      }
+      if(TAB==='events'){
+        return !!s.name;
+      }
+      return false;
     }
-
-    // ===== GRID RENDER =====
-    function filtered(list){
-      if(!FILTER) return list||[];
-      const f = FILTER;
-      return (list||[]).filter(x => (x.name||'').toLowerCase().includes(f));
+    function setSaveEnabled(on){
+      if(on){ saveBtn.removeAttribute('disabled'); }
+      else  { saveBtn.setAttribute('disabled','disabled'); }
     }
-
-    function renderGrid(){
-      const grid = $('#grid'); grid.innerHTML = '';
-      const listRaw = TAB==='cats' ? DATA.cats : TAB==='prods' ? DATA.prods : DATA.events;
-      const list = filtered(listRaw||[]);
-
-      if(list.length===0){ grid.innerHTML = `<div class="note">Kayıt bulunamadı.</div>`; return; }
-
-      list.forEach(obj=>{
-        const img = obj.images?.w640 || obj.imageUrl || '';
-        const title = esc(obj.name||'');
-        let sub = '';
-        if(TAB==='cats'){
-          sub = (obj.kind==='drink'?'İçecek':'Yemek') + (obj.updatedAt? ` · ${new Date(obj.updatedAt).toLocaleDateString('tr-TR')}` : '');
-        } else if(TAB==='prods'){
-          const price = obj.price && (obj.price.$numberDecimal || obj.price);
-          sub = `${fmt(price)}${obj.categoryName? ' · '+obj.categoryName:''}`;
-        } else {
-          sub = (obj.updatedAt? new Date(obj.updatedAt).toLocaleDateString('tr-TR') : '');
-        }
-
-        const card = document.createElement('div');
-        card.className='itm';
-        card.innerHTML = `
-          <img class="thumb" src="${img}" alt="">
-          <div class="itm-body">
-            <div style="font-weight:700; font-size:14px;">${title}</div>
-            <div class="muted">${esc(sub)}</div>
-          </div>`;
-        card.addEventListener('click', ()=> openModalForEdit(obj));
-        grid.append(card);
+    function wireFormDirtyWatcher(){
+      ['#formName','#formDesc','#formPrice','#formCategory','#formType','#formImage'].forEach(sel=>{
+        const n = document.querySelector(sel);
+        if(!n) return;
+        const handler = ()=>{
+          const now = snapshotForm();
+          const isEdit = !!now.id;
+          const valid = validateForm();
+          const changed = isEdit ? hasChanged(FORM_SNAPSHOT, now) : true; // create: tüm zorunlular dolmadan yine de validate false bırakır
+          setSaveEnabled(valid && changed);
+        };
+        n.addEventListener('input', handler);
+        n.addEventListener('change', handler);
       });
     }
 
-    // ===== MODAL (EKLE/DÜZENLE) =====
-    $('#btnAdd').addEventListener('click', ()=> openModalForCreate());
-
-    function resetModal(){
-      ORIG = null; FILE_CHANGED = false;
+    function openModalForCreate(){
+      $('#modalTitle').textContent = TAB==='cats' ? 'Yeni Kategori' : TAB==='prods' ? 'Yeni Ürün' : 'Yeni Etkinlik';
       $('#formId').value = '';
       $('#formName').value = '';
       $('#formDesc').value = '';
       $('#formPrice').value = '';
       $('#formCategory').innerHTML = '';
-      $('#formKind').value = 'food';
       $('#formImage').value = '';
       $('#formPreview').src = '';
-      $('#formMsg').textContent = '';
-      setSaveEnabled(false);
-    }
-    function setSaveEnabled(on){ $('#btnSave').disabled = !on; }
 
-    function openModalForCreate(){
-      resetModal();
-      $('#modalTitle').textContent = TAB==='cats' ? 'Yeni Kategori' : TAB==='prods' ? 'Yeni Ürün' : 'Yeni Etkinlik';
-
-      // alan görünürlükleri
       $('#slotType').classList.toggle('hide', TAB!=='cats');
       $('#slotDesc').classList.toggle('hide', TAB==='cats');
       $('#slotPrice').classList.toggle('hide', TAB!=='prods');
 
       if(TAB==='prods'){
-        (DATA.cats||[]).forEach(c=>{
+        const cats = DATA.cats || [];
+        cats.forEach(c=>{
           const o = document.createElement('option');
           o.value = c._id; o.textContent = c.name; $('#formCategory').append(o);
         });
       }
+
+      $('#formMsg').textContent = '';
+      FORM_SNAPSHOT = snapshotForm(); // boş hal
+      wireFormDirtyWatcher();
+      setSaveEnabled(false); // tüm zorunlular dolunca açılacak
       $('#modal').classList.add('show');
-      updateSaveState(); // create modunda valid değil ise disable
     }
 
     function openModalForEdit(obj){
-      resetModal();
-      ORIG = JSON.parse(JSON.stringify(obj)); // deep copy
       $('#modalTitle').textContent = TAB==='cats' ? 'Kategoriyi Düzenle' : TAB==='prods' ? 'Ürünü Düzenle' : 'Etkinliği Düzenle';
       $('#formId').value = obj._id;
       $('#formName').value = obj.name || '';
       $('#formDesc').value = obj.description || '';
-      const price = obj.price && (obj.price.$numberDecimal || obj.price);
-      $('#formPrice').value = price || '';
+      $('#formPrice').value = (TAB==='prods' && obj.price != null) ? Number(obj.price).toString() : '';
+      $('#formImage').value = '';
       $('#formPreview').src = (obj.images?.w640 || obj.imageUrl || '');
 
       $('#slotType').classList.toggle('hide', TAB!=='cats');
       $('#slotDesc').classList.toggle('hide', TAB==='cats');
       $('#slotPrice').classList.toggle('hide', TAB!=='prods');
 
-      if(TAB==='cats'){ $('#formKind').value = obj.kind || 'food'; }
+      if(TAB==='cats'){ $('#formType').value = (obj.kind || 'food'); }
       if(TAB==='prods'){
         $('#formCategory').innerHTML = '';
         (DATA.cats||[]).forEach(c=>{
@@ -447,66 +485,21 @@
           $('#formCategory').append(o);
         });
       }
+
+      $('#formMsg').textContent = '';
+      FORM_SNAPSHOT = snapshotForm(); // dolu hal
+      wireFormDirtyWatcher();
+      setSaveEnabled(false); // değişiklik olunca açılacak
       $('#modal').classList.add('show');
-      updateSaveState(); // başlangıçta değişiklik yok => disable
     }
 
     document.querySelectorAll('[data-close]').forEach(n=> n.addEventListener('click', ()=> $('#modal').classList.remove('show')));
-
-    // file preview + dirty
     $('#formImage').addEventListener('change', ()=>{
-      const f = $('#formImage').files?.[0];
-      FILE_CHANGED = !!f;
-      if(!f){ $('#formPreview').src=''; updateSaveState(); return; }
-      const r = new FileReader(); r.onload = ()=> { $('#formPreview').src = r.result; updateSaveState(); }; r.readAsDataURL(f);
+      const f = $('#formImage').files?.[0]; if(!f){ $('#formPreview').src=''; return; }
+      const r = new FileReader(); r.onload = ()=> $('#formPreview').src = r.result; r.readAsDataURL(f);
     });
 
-    // değişiklik takibi
-    ['formName','formDesc','formPrice','formCategory','formKind'].forEach(id=>{
-      const node = document.getElementById(id);
-      node.addEventListener('input', updateSaveState);
-      node.addEventListener('change', updateSaveState);
-    });
-
-    function isValidForm(){
-      const name = $('#formName').value.trim();
-      if(!name) return false;
-      if(TAB==='cats'){
-        return !!$('#formKind').value;
-      } else if(TAB==='prods'){
-        const price = parseFloat($('#formPrice').value);
-        const cat = $('#formCategory').value;
-        return !!cat && !Number.isNaN(price);
-      } else {
-        return true; // events: sadece name zorunlu
-      }
-    }
-
-    function isDirty(){
-      if(!ORIG) return ( // create
-        isValidForm() // valid ve en az bir alan dolu
-      );
-      // edit modunda alan kıyasla
-      if(FILE_CHANGED) return true;
-      const name = $('#formName').value.trim();
-      if(name !== (ORIG.name||'')) return true;
-      if(TAB==='cats'){
-        if($('#formKind').value !== (ORIG.kind||'food')) return true;
-      } else if(TAB==='prods'){
-        const priceNow = $('#formPrice').value;
-        const priceOrig = ORIG.price && (ORIG.price.$numberDecimal || ORIG.price) || '';
-        if(String(priceNow) !== String(priceOrig)) return true;
-        if($('#formCategory').value !== String(ORIG.categoryId||'')) return true;
-        if(($('#formDesc').value||'') !== (ORIG.description||'')) return true;
-      } else {
-        if(($('#formDesc').value||'') !== (ORIG.description||'')) return true;
-      }
-      return false;
-    }
-
-    function updateSaveState(){ setSaveEnabled(isValidForm() && isDirty()); }
-
-    // ===== SUBMIT =====
+    // ===== FORM SUBMIT (Create/Update + Upload) =====
     $('#modalForm').addEventListener('submit', async (e)=>{
       e.preventDefault();
       const id = $('#formId').value.trim();
@@ -516,42 +509,99 @@
       const msg = $('#formMsg');
 
       try{
+        let newId = id;
+
         if(TAB==='cats'){
-          const kind = $('#formKind').value;
-          const payload = { name, kind };
-          const res = id ? await http('PUT', EP.putCat(id), payload)
-                         : await http('POST', EP.postCat, payload);
-          const _id = res._id || id;
-          if(file){ const fd = new FormData(); fd.append('file', file); await http('POST', EP.upCat(_id), fd, false); }
+          const payload = { name, kind: $('#formType').value };
+          const res = id ? await http('PUT', `${EP.cats}/${id}`, payload)
+                         : await http('POST', EP.cats, payload);
+          newId = res._id || id;
+          if(file){ const fd = new FormData(); fd.append('file', file); await http('POST', EP.upCat(newId), fd, false); }
         }
         else if(TAB==='prods'){
           const price = parseFloat($('#formPrice').value);
           const categoryId = $('#formCategory').value;
+          // validateForm zaten etkin — ekstradan korunma:
+          if(!name || isNaN(price) || !categoryId) throw new Error('Zorunlu alanlar eksik');
           const payload = { name, description, price, categoryId };
-          const res = id ? await http('PUT', EP.putProd(id), payload)
-                         : await http('POST', EP.postProd, payload);
-          const _id = res._id || id;
-          if(file){ const fd = new FormData(); fd.append('file', file); await http('POST', EP.upProd(_id), fd, false); }
+          const res = id ? await http('PUT', `${EP.prods}/${id}`, payload)
+                         : await http('POST', EP.prods, payload);
+          newId = res._id || id;
+          if(file){ const fd = new FormData(); fd.append('file', file); await http('POST', EP.upProd(newId), fd, false); }
         }
-        else {
+        else if(TAB==='events'){
           const payload = { name, description };
-          const res = id ? await http('PUT', EP.putEvent(id), payload)
-                         : await http('POST', EP.postEvent, payload);
-          const _id = res._id || id;
-          if(file){ const fd = new FormData(); fd.append('file', file); await http('POST', EP.upEvent(_id), fd, false); }
+          const res = id ? await http('PUT', `${EP.events}/${id}`, payload)
+                         : await http('POST', EP.events, payload);
+          newId = res._id || id;
+          if(file){ const fd = new FormData(); fd.append('file', file); await http('POST', EP.upEvent(newId), fd, false); }
         }
 
         msg.textContent = 'Kaydedildi'; msg.className='note success';
-        setTimeout(async ()=>{
-          $('#modal').classList.remove('show');
-          // ilgili sekmeyi tazele
-          await loadCurrent(true);
-        }, 350);
+        setSaveEnabled(false);
+        setTimeout(()=> { $('#modal').classList.remove('show'); }, 350);
+        await reloadCurrent();
+        renderGrid();
       }catch(err){
         msg.textContent = err.message || 'İşlem başarısız';
         msg.className = 'note error';
       }
     });
+
+    // ===== LOADERS =====
+    async function loadCats(){ DATA.cats = await http('GET', EP.cats); }
+    async function loadProds(){
+      // Ürünler için kategori adları lazım → önce/beraber çek
+      if(DATA.cats.length === 0) { try{ await loadCats(); }catch(_){} }
+      DATA.prods = await http('GET', EP.prods);
+    }
+    async function loadEvents(){ DATA.events = await http('GET', EP.events); }
+
+    async function reloadCurrent(){
+      if(TAB==='cats') await loadCats();
+      else if(TAB==='prods') await loadProds();
+      else await loadEvents();
+    }
+
+    // ===== RENDER =====
+    function render(){ $('#infoMsg').textContent = ''; renderGrid(); }
+
+    function filtered(list){
+      if(!FILTER) return list;
+      const f = FILTER;
+      return (list||[]).filter(x => (x.name||'').toLowerCase().includes(f));
+    }
+
+    function renderGrid(){
+      const grid = $('#grid'); grid.innerHTML = '';
+      let list = TAB==='cats' ? DATA.cats : TAB==='prods' ? DATA.prods : DATA.events;
+      list = filtered(list);
+
+      if(list.length===0){ grid.innerHTML = `<div class="note">Kayıt bulunamadı.</div>`; return; }
+
+      // categoryId -> name haritası
+      const catMap = new Map((DATA.cats||[]).map(c=>[String(c._id), c.name]));
+
+      const toCard = (obj)=>{
+        const img = obj.images?.w640 || obj.imageUrl || '';
+        const title = esc(obj.name||'');
+        let sub = '';
+        if(TAB==='cats') sub = (obj.kind==='drink'?'İçecek':'Yemek') + (obj.updatedAt? ` · ${new Date(obj.updatedAt).toLocaleDateString('tr-TR')}` : '');
+        if(TAB==='prods') sub = `${fmt(obj.price)}${obj.categoryId? ' · '+(catMap.get(String(obj.categoryId)) || ''):''}`;
+        if(TAB==='events') sub = (obj.updatedAt? new Date(obj.updatedAt).toLocaleDateString('tr-TR') : '');
+
+        const card = document.createElement('div'); card.className='itm';
+        card.innerHTML = `
+          <img class="thumb" src="${img}" alt="">
+          <div class="itm-body">
+            <div class="title">${title}</div>
+            <div class="muted">${esc(sub)}</div>
+          </div>`;
+        card.addEventListener('click', ()=> openModalForEdit(obj)); // popup edit
+        return card;
+      };
+      list.forEach(o=> grid.append(toCard(o)));
+    }
   </script>
 </body>
 </html>
