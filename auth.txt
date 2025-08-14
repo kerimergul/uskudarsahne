@@ -1,0 +1,3 @@
+mongodb auth
+username:keriimergul
+password:O9WnsCIeZD1agiFH
