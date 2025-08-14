@@ -746,9 +746,12 @@ body {
     margin-bottom: .25rem
 }
 
-.my-10 {
-    margin-top: 2.5rem;
+.my-10 {   
     margin-bottom: 2.5rem
+}
+
+.mt-10 {
+    margin-top: 2.5rem;
 }
 
 .my-2 {
