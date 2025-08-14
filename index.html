@@ -15,6 +15,24 @@
   <meta name="description" content="Üsküdar Sahne Menü"/>
   <meta property="og:title" content="Üsküdar Sahne Menü"/>
   <link rel="preload" href="https://qrmenu-cdn.b-cdn.net/fonts/e4af272ccee01ff0-s.p.woff2" as="font" type="font/woff2" crossorigin>
+
+  <!-- Küçük yardımcı stiller -->
+  <style>
+    .is-hidden{ display:none !important; }
+
+    /* Slider için güvenli varsayılanlar (harici CSS yoksa devreye girer) */
+    .auto-slider{ position:relative; overflow:hidden; }
+    .auto-slider .track{ display:flex; transition: transform .45s ease; will-change: transform; }
+    .auto-slider .slide{ flex: 0 0 100%; }
+    .auto-slider .slide img{ display:block; width:100%; height:200px; object-fit:cover; }
+    .auto-slider .nav{
+      position:absolute; top:50%; transform:translateY(-50%);
+      background:rgba(0,0,0,.45); color:#fff; border:0; width:36px; height:36px;
+      border-radius:999px; cursor:pointer;
+    }
+    .auto-slider .nav.prev{ left:8px; }
+    .auto-slider .nav.next{ right:8px; }
+  </style>
 </head>
 <body>
   <div class="__className_e8ce0c">
@@ -36,9 +54,9 @@
         <div class="flex items-center justify-between w-full pt-1">
           <div class="flex items-center space-x-2 w-full">
             <div class="flex space-x-2 overflow-x-auto flex-1">
-              <button class="filter-btn inline-flex items-center justify-center whitespace-nowrap rounded-md transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 dark:active:text-opacity-50 active:text-opacity-50 bg-qrbackground !rounded-sm dark:border-transparent border border-qrborder2 dark:bg-[#26282d] px-4 py-2 capitalize font-normal text-[12px] h-8 w-[72px]" data-filter="all">Tümü</button>
-              <button class="filter-btn inline-flex items-center justify-center whitespace-nowrap rounded-md transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 dark:active:text-opacity-50 dark:text-white active:text-opacity-50 bg-qrbackground !rounded-sm dark:border-transparent border border-qrborder2 dark:bg-[#26282d] px-4 py-2 capitalize font-normal text-[12px] h-8 w-[72px]" data-filter="food">Yemek</button>
-              <button class="filter-btn inline-flex items-center justify-center whitespace-nowrap rounded-md transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 dark:active:text-opacity-50 dark:text-white active:text-opacity-50 bg-qrbackground !rounded-sm dark:border-transparent border border-qrborder2 dark:bg-[#26282d] px-4 py-2 capitalize font-normal text-[12px] h-8 w-[72px]" data-filter="drink">İçecek</button>
+              <button class="filter-btn inline-flex items-center justify-center whitespace-nowrap rounded-md transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 active:text-opacity-50 bg-qrbackground !rounded-sm border border-qrborder2 px-4 py-2 capitalize font-normal text-[12px] h-8 w-[72px]" data-filter="all">Tümü</button>
+              <button class="filter-btn inline-flex items-center justify-center whitespace-nowrap rounded-md transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 active:text-opacity-50 bg-qrbackground !rounded-sm border border-qrborder2 px-4 py-2 capitalize font-normal text-[12px] h-8 w-[72px]" data-filter="food">Yemek</button>
+              <button class="filter-btn inline-flex items-center justify-center whitespace-nowrap rounded-md transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 active:text-opacity-50 bg-qrbackground !rounded-sm border border-qrborder2 px-4 py-2 capitalize font-normal text-[12px] h-8 w-[72px]" data-filter="drink">İçecek</button>
             </div>
           </div>
         </div>
@@ -49,21 +67,11 @@
         <div id="menuGrid" class="grid gap-3 grid-cols-2"></div>
       </div>
 
-      <!-- EVENTS SLIDER (dynamic) -->
-      <section class="px-3 my-3" aria-labelledby="events-title">
-        <h2 id="events-title" class="slider-title text-sm font-semibold">Gelecek Etkinlikler</h2>
-
-        <div class="auto-slider">
-          <div class="track" id="autoTrack">
-            <!-- Boş bırakıyoruz; JS "upcoming" endpoint'ten dolduracak.
-                 Eğer API'den sonuç gelmezse bu default statik içerik yedek olarak kalabilir -->
-            <div class="slide"><img src="https://qrmenu-cdn.b-cdn.net/assets/1.jpg" alt="Etkinlik 1"></div>
-            <div class="slide"><img src="https://qrmenu-cdn.b-cdn.net/assets/2.jpg" alt="Etkinlik 2"></div>
-            <div class="slide"><img src="https://qrmenu-cdn.b-cdn.net/assets/3.jpg" alt="Etkinlik 3"></div>
-            <div class="slide"><img src="https://qrmenu-cdn.b-cdn.net/assets/4.jpg" alt="Etkinlik 4"></div>
-            <div class="slide"><img src="https://qrmenu-cdn.b-cdn.net/assets/5.png" alt="Etkinlik 5"></div>
-          </div>
-
+      <!-- EVENTS SLIDER (dynamic, başlangıçta gizli) -->
+      <section id="eventsSection" class="px-3 my-3 is-hidden" aria-labelledby="events-title">
+        <h2 id="events-title" class="text-sm font-semibold">Gelecek Etkinlikler</h2>
+        <div class="auto-slider" id="eventsSlider">
+          <div class="track" id="autoTrack"></div>
           <button class="nav prev" type="button" data-dir="prev" aria-label="Önceki görsel">‹</button>
           <button class="nav next" type="button" data-dir="next" aria-label="Sonraki görsel">›</button>
         </div>
@@ -107,7 +115,7 @@
 
     async function fetchJSON(url){
       try{
-        const res = await fetch(url, { credentials: 'omit' });
+        const res = await fetch(url, { credentials: 'omit', cache: 'no-store' });
         if(!res.ok) throw new Error(`${res.status}`);
         return await res.json();
       }catch(e){
@@ -116,6 +124,7 @@
       }
     }
 
+    // ---- KATEGORİLER ----
     function renderCategories(cats){
       const grid = document.getElementById('menuGrid');
       grid.innerHTML = '';
@@ -154,7 +163,7 @@
       buttons.forEach(btn=>{
         btn.addEventListener('click', ()=>{
           const f = btn.dataset.filter;
-          buttons.forEach(b=>b.classList.remove('ring','ring-1')); // basit aktif görseli istersen class ekle
+          buttons.forEach(b=>b.classList.remove('ring','ring-1'));
           btn.classList.add('ring','ring-1');
 
           document.querySelectorAll('.filter-card').forEach(card=>{
@@ -170,16 +179,60 @@
       if(data) { renderCategories(data); wireCategoryFilter(); }
     }
 
-    function startOfTodayISO(){
-      const d = new Date();
-      d.setHours(0,0,0,0);
-      return d.toISOString();
+    // ---- ETKİNLİKLER (slider) ----
+    let sliderTimer = null;
+    function destroyAutoSlider(){
+      if(sliderTimer){ clearInterval(sliderTimer); sliderTimer = null; }
+      const track = document.getElementById('autoTrack');
+      if (track) track.style.transform = 'translateX(0)';
+    }
+
+    function initAutoSlider(){
+      destroyAutoSlider();
+      const container = document.getElementById('eventsSlider');
+      const track = document.getElementById('autoTrack');
+      const prevBtn = container.querySelector('.nav.prev');
+      const nextBtn = container.querySelector('.nav.next');
+
+      const slides = track.children.length;
+      if(!slides) return;
+
+      let index = 0;
+      const go = (i)=>{
+        index = (i + slides) % slides;
+        track.style.transform = `translateX(${-index * 100}%)`;
+      };
+      const start = ()=>{
+        destroyAutoSlider();
+        sliderTimer = setInterval(()=> go(index + 1), 3500);
+      };
+
+      prevBtn.onclick = ()=>{ go(index - 1); start(); };
+      nextBtn.onclick = ()=>{ go(index + 1); start(); };
+      container.addEventListener('mouseenter', ()=> destroyAutoSlider());
+      container.addEventListener('mouseleave', ()=> start());
+      window.addEventListener('visibilitychange', ()=> document.hidden ? destroyAutoSlider() : start());
+      window.addEventListener('resize', ()=> go(index)); // yeniden boyutta konum tazele
+
+      go(0); start();
     }
 
     function renderEventsSlider(events){
-      if(!Array.isArray(events) || events.length===0) return; // mevcut statik içerik kalsın
+      const section = document.getElementById('eventsSection');
       const track = document.getElementById('autoTrack');
+
+      // veri yoksa gizli kalsın
+      if(!Array.isArray(events) || events.length === 0){
+        section.classList.add('is-hidden');
+        destroyAutoSlider();
+        track.innerHTML = '';
+        return;
+      }
+
+      // veri varsa görünür yap ve doldur
+      section.classList.remove('is-hidden');
       track.innerHTML = '';
+
       for(const ev of events){
         const name = ev.name || 'Etkinlik';
         const when = ev.eventDate ? new Date(ev.eventDate) : null;
@@ -188,27 +241,40 @@
 
         const slide = document.createElement('div');
         slide.className = 'slide';
-        slide.innerHTML = `<img src="${img}" alt="${escAttr(alt)}">`;
+        slide.innerHTML = `<img src="${img}" alt="${escAttr(alt)}" loading="lazy" decoding="async">`;
         track.appendChild(slide);
       }
+
+      // DOM güncellendikten sonra slider’ı kur
+      requestAnimationFrame(()=> initAutoSlider());
+    }
+
+    function startOfTodayISO(){
+      const d = new Date();
+      d.setHours(0,0,0,0);
+      return d.toISOString();
     }
 
     async function loadUpcomingEvents(){
       const fromISO = startOfTodayISO();
       const url = `${API_BASE}/api/events/upcoming?from=${encodeURIComponent(fromISO)}&limit=12`;
-      const data = await fetchJSON(url);
-      if(data) renderEventsSlider(data);
+
+      try{
+        const res = await fetch(url, { credentials:'omit', cache:'no-store' });
+        if(!res.ok) throw new Error(res.status);
+        const data = await res.json();
+        renderEventsSlider(data);
+      }catch(e){
+        // hata halinde de gizli kalsın
+        renderEventsSlider([]);
+        console.error('[events]', e);
+      }
     }
 
     // Boot
     document.addEventListener('DOMContentLoaded', async ()=>{
       await Promise.all([loadCategories(), loadUpcomingEvents()]);
-      // menufilter.js/slider.js zaten en altta yüklenecek; DOM hazır olduğunda çalışacak.
     });
   </script>
-
-  <!-- Bu sıralama önemli: önce dinamik içerik oluşturuldu, ardından slider ve filtre betikleri devreye giriyor -->
-  <script src="./scripts/slider.js"></script>
-  <script src="./scripts/menufilter.js"></script>
 </body>
 </html>
