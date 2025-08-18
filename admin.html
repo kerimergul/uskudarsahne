@@ -30,7 +30,7 @@
     .btn:hover{ filter:brightness(1.05); }
     .btn.primary{ background: linear-gradient(180deg, #2563eb, #1d4ed8); }
     .btn.ghost{ background:transparent; border-color:var(--stroke); }
-    .btn.danger{ background:#2a0f14; border-color:#5e1b27; color:#ffb4be; }
+    .btn.danger{ background:#2a0f14; border:1px solid #5e1b27; color:#ffb4be; }
     .btn[disabled]{ opacity:.5; cursor:not-allowed; }
     .mini{ font-size:12px; padding:7px 10px; }
 
@@ -64,7 +64,7 @@
     .card{ background:var(--card); border:1px solid var(--stroke); border-radius:14px; padding:16px; }
     .toolrow{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
     .toolrow .grow{ flex:1; min-width:220px; }
-    input[type="search"], input[type="text"], input[type="number"], input[type="datetime-local"], textarea, select{
+    input[type="search"], input[type="text"], input[type="number"], textarea, select{
       width:100%; padding:10px 12px; background:#0f1320; color:var(--text); border:1px solid #2a2f45; border-radius:10px; outline:none;
     }
     .note{ font-size:12px; color:#aab; margin-top:8px; }
@@ -78,19 +78,21 @@
       margin-top:12px;
     }
     .itm{
-      background:#101321; border:1px solid var(--stroke); border-radius:12px; cursor:pointer; overflow:hidden;
+      background:#101321; border:1px solid var(--stroke); border-radius:12px; cursor:grab; overflow:hidden;
       display:flex; flex-direction:column;
     }
     .itm:hover{ border-color:#2a3553; background:#12182a; }
+    .itm:active{ cursor:grabbing; }
     .thumb{ width:100%; aspect-ratio: 16/10; object-fit:cover; background:#0c0f1b; border-bottom:1px solid var(--stroke); }
     .itm-body{ padding:10px; display:flex; flex-direction:column; gap:6px; }
     .title{ font-weight:700; font-size:14px; }
-    .muted{ color:#8b8fa3; font-size:12px; }
+    .muted{ color:var(--muted); font-size:12px; }
+    .itm.dragging{ opacity:.55; outline:2px dashed #2a3553; }
 
     /* LOGIN CARD */
     .centered{ max-width:520px; margin:20px auto; }
 
-    /* MODAL */
+    /* MODALS */
     .modal{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:50; }
     .modal.show{ display:flex; }
     .backdrop{ position:absolute; inset:0; background:rgba(0,0,0,.55); }
@@ -99,10 +101,29 @@
     .row + .row{ margin-top:10px; }
     label{ display:block; font-size:12px; color:var(--muted); margin:10px 0 6px; }
 
+    /* Confirm modal small sheet */
+    .sheet.confirm{ width:min(420px, 92vw); }
+
     /* Sidebar backdrop (mobile) */
     .sb-backdrop{ display:none; }
 
     .hide{ display:none !important; }
+
+    /* CROPPER */
+    .cropper{
+      position:relative; width:100%; max-width:300px; aspect-ratio:1/1;
+      background:#0c0f1b; border:1px solid var(--stroke); border-radius:10px; overflow:hidden;
+      touch-action:none; user-select:none;
+    }
+    .cropper img{
+      position:absolute; top:50%; left:50%;
+      transform: translate(-50%,-50%) scale(1);
+      will-change: transform;
+      pointer-events:none;
+    }
+    .crop-controls{ display:flex; gap:8px; align-items:center; margin-top:8px; }
+    .crop-controls input[type="range"]{ width:160px; }
+    .hint{ font-size:11px; color:#9aa; margin-top:6px; }
 
     /* ====== RESPONSIVE ====== */
     @media (max-width: 1024px){
@@ -189,7 +210,7 @@
     </main>
   </div>
 
-  <!-- MODAL -->
+  <!-- EDIT/CREATE MODAL -->
   <div class="modal" id="modal">
     <div class="backdrop" data-close></div>
     <div class="sheet">
@@ -226,34 +247,52 @@
           </div>
         </div>
 
-        <!-- YENİ: Etkinlik Tarihi -->
-        <div id="slotEventDate" class="hide">
-          <label for="formEventDate">Etkinlik Tarihi (Gün & Saat)</label>
-          <input id="formEventDate" type="datetime-local" />
-        </div>
-
         <div class="row">
           <div>
             <label for="formImage">Görsel</label>
             <input id="formImage" type="file" accept="image/*" />
+            <div class="hint">Yeni görsel yüklerseniz sağdaki 1:1 alanda yakınlaştırıp sürükleyerek kırpabilirsiniz.</div>
           </div>
           <div>
-            <label>Önizleme</label>
-            <img id="formPreview" class="thumb" alt="" />
+            <label>Önizleme / Kırpma (1:1)</label>
+            <div id="cropStage" class="cropper">
+              <img id="cropImg" alt="">
+            </div>
+            <div class="crop-controls">
+              <button type="button" class="btn mini" id="zoomOut">−</button>
+              <input type="range" id="zoomRange" min="1" max="3" step="0.01" value="1" />
+              <button type="button" class="btn mini" id="zoomIn">+</button>
+              <button type="button" class="btn ghost mini" id="cropReset">Sıfırla</button>
+            </div>
           </div>
         </div>
 
         <div class="toolrow" style="margin-top:12px; justify-content:flex-end;">
-          <button class="btn ghost" type="button" data-close>Kapat</button>
           <button class="btn primary" type="submit" id="btnSave" disabled>Kaydet</button>
+          <button class="btn danger" type="button" id="btnDelete" hidden>Sil</button>
+          <button class="btn ghost" type="button" data-close>Kapat</button>
         </div>
         <div id="formMsg" class="note"></div>
       </form>
     </div>
   </div>
 
+  <!-- CONFIRM MODAL -->
+  <div class="modal" id="confirmModal">
+    <div class="backdrop"></div>
+    <div class="sheet confirm">
+      <h3 style="margin:0 0 10px; font-size:15px;">Emin misiniz?</h3>
+      <div id="confirmText" class="note" style="margin-bottom:10px;"></div>
+      <div class="toolrow" style="justify-content:flex-end;">
+        <button class="btn ghost" id="btnNo">Hayır</button>
+        <button class="btn danger" id="btnYes">Evet</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     // ===== CONFIG =====
+    // TODO: burayı kendi API domaininle güncelle:
     const API_BASE = "https://uskudarsahne-api.onrender.com";
     const EP = {
       login:  API_BASE + "/api/auth/login",
@@ -265,27 +304,39 @@
       upCat:  id => API_BASE + `/api/admin/upload/categories/${id}`,
       upProd: id => API_BASE + `/api/admin/upload/products/${id}`,
       upEvent:id => API_BASE + `/api/admin/upload/events/${id}`,
+      // Toplu sıralama kaydı için önerilen endpointler (varsa kullanır; yoksa fallback tek tek order alanı günceller)
+      reorderCat:  API_BASE + "/api/admin/categories/reorder",
+      reorderProd: API_BASE + "/api/admin/products/reorder",
+      reorderEvent:API_BASE + "/api/admin/events/reorder",
     };
+    const TAB2EPKEY = { cats:'cats', prods:'prods', events:'events' };
+    const TAB2REORDER = { cats:'reorderCat', prods:'reorderProd', events:'reorderEvent' };
 
     // ===== STATE =====
     const $ = s => document.querySelector(s);
-    let TAB = "cats";                         // cats | prods | events
-    let DATA = { cats: null, prods: null, events: null };
+    let TAB = "cats";           // cats | prods | events
+    let DATA = { cats:[], prods:[], events:[] };
     let FILTER = "";
-    let FORM_SNAPSHOT = null;                 // modal ilk hali
+    let FORM_SNAPSHOT = null;   // modal ilk hali
+
+    // Cropper state
+    const crop = {
+      file: null,               // File (varsa)
+      imgEl: $('#cropImg'),
+      stageEl: $('#cropStage'),
+      natW: 0, natH:0,
+      baseScale: 1,
+      zoom: 1,
+      offX: 0, offY: 0,
+      active: false,            // yeni dosya seçildiyse true
+    };
 
     // ===== HELPERS =====
     function setStatus(t){ $('#status').textContent = t; }
     function show(el){ el.classList.remove('hide'); }
     function hide(el){ el.classList.add('hide'); }
     function esc(str){ return (str||"").toString(); }
-    const fmtMoney = n => new Intl.NumberFormat('tr-TR',{style:'currency',currency:'TRY'}).format(Number(n)||0);
-    const fmtDate  = iso => { if(!iso) return ''; const d=new Date(iso); if(isNaN(d)) return ''; return d.toLocaleString('tr-TR'); };
-    function toDatetimeLocalValue(iso){
-      if(!iso) return ''; const d=new Date(iso); if(isNaN(d)) return '';
-      const p=n=>String(n).padStart(2,'0');
-      return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
-    }
+    const fmt = n => new Intl.NumberFormat('tr-TR',{style:'currency',currency:'TRY'}).format(Number(n)||0);
 
     async function http(method, url, body, json=true){
       const opt = { method, credentials:'include', headers:{} };
@@ -296,27 +347,42 @@
       const res = await fetch(url, opt);
       if(res.status===401) throw new Error('401');
       if(!res.ok){
-        let msg=''; try{ const j=await res.json(); msg=j.message||j.error||''; }catch(_){}
+        let msg = '';
+        try{ const j = await res.json(); msg = j.message || j.error || ''; }catch(_){}
         throw new Error(msg || `Hata: ${res.status}`);
       }
       const ct = res.headers.get('content-type')||'';
       return ct.includes('application/json') ? res.json() : res.text();
     }
 
-    function dashTitle(){ return TAB==='cats' ? 'Kategoriler' : TAB==='prods' ? 'Ürünler' : 'Etkinlikler'; }
+    function dashTitle(){
+      return TAB==='cats' ? 'Kategoriler' : TAB==='prods' ? 'Ürünler' : 'Etkinlikler';
+    }
+
+    // sort helper (order -> name fallback)
+    function sortStandard(arr){
+      const getOrd = o => (typeof o.order==='number' ? o.order : Number.MAX_SAFE_INTEGER);
+      return arr.sort((a,b)=> getOrd(a)-getOrd(b) || (a.name||'').localeCompare(b.name||'', 'tr'));
+    }
 
     // ===== AUTH =====
     $('#btnLogin').addEventListener('click', async ()=>{
       const username = $('#username').value.trim();
       const password = $('#password').value;
-      $('#loginMsg').textContent='';
+      $('#loginMsg').textContent = '';
       try{
         await http('POST', EP.login, { username, password });
-        setLoggedInUI(username);
+        $('#btnLogout').hidden = false;
+        $('#sidebar').hidden = false;
+        hide($('#loginCard')); show($('#app'));
+        setStatus(`Giriş yapıldı: ${username}`);
+        $('#dashTitle').textContent = dashTitle();
+        $('#btnAdd').disabled = false;
         await reloadCurrent();
         render();
       }catch(err){
-        $('#loginMsg').textContent = (err.message==='401') ? 'Hatalı kullanıcı adı/şifre' : (err.message||'Giriş başarısız');
+        if(err.message==='401'){ $('#loginMsg').textContent='Hatalı kullanıcı adı/şifre'; }
+        else $('#loginMsg').textContent = err.message||'Giriş başarısız';
         setStatus('Bağlı değil');
       }
     });
@@ -326,21 +392,17 @@
       location.reload();
     });
 
-    function setLoggedInUI(username){
-      $('#btnLogout').hidden = false;
-      $('#sidebar').hidden = false;
-      hide($('#loginCard')); show($('#app'));
-      setStatus(`Giriş yapıldı: ${username||''}`);
-      $('#dashTitle').textContent = dashTitle();
-      $('#btnAdd').disabled = false;
-    }
-
-    // Oturum var mı? (sayfa yenilense de)
+    // BOOT: aktif session var mı?
     (async function boot(){
       try{
         const me = await http('GET', EP.me);
         if(me.loggedIn){
-          setLoggedInUI(me.user?.username || 'admin');
+          $('#btnLogout').hidden = false;
+          $('#sidebar').hidden = false;
+          hide($('#loginCard')); show($('#app'));
+          setStatus(`Giriş yapıldı: ${me.user?.username || 'admin'}`);
+          $('#dashTitle').textContent = dashTitle();
+          $('#btnAdd').disabled = false;
           await reloadCurrent();
           render();
           return;
@@ -350,10 +412,16 @@
     })();
 
     // ===== SIDEBAR TOGGLE (mobile) =====
-    const closeSidebar = ()=>{ document.body.classList.remove('sidebar-open'); $('#sidebar').classList.remove('show'); };
-    $('#btnMenu').addEventListener('click', ()=>{ document.body.classList.toggle('sidebar-open'); $('#sidebar').classList.toggle('show'); });
+    const closeSidebar = ()=>{
+      document.body.classList.remove('sidebar-open');
+      $('#sidebar').classList.remove('show');
+    };
+    $('#btnMenu').addEventListener('click', ()=>{
+      document.body.classList.toggle('sidebar-open');
+      $('#sidebar').classList.toggle('show');
+    });
     $('#sbBackdrop').addEventListener('click', closeSidebar);
-    window.addEventListener('resize', ()=>{ if(window.innerWidth>920){ closeSidebar(); } });
+    window.addEventListener('resize', ()=>{ if(window.innerWidth > 920){ closeSidebar(); } });
 
     // ===== NAV =====
     document.querySelectorAll('.nav-item').forEach(btn=>{
@@ -362,77 +430,26 @@
         btn.classList.add('active');
         TAB = btn.dataset.tab;
         $('#dashTitle').textContent = dashTitle();
-        $('#searchInput').value = ''; FILTER = '';
+        $('#searchInput').value = '';
+        FILTER = '';
         closeSidebar();
-        await reloadCurrent(); // sadece o sekmeyi çek
+        await reloadCurrent(); // sadece seçili sekmeyi çek
         render();
       });
     });
 
     // ===== SEARCH =====
-    $('#searchInput').addEventListener('input', e=>{ FILTER = e.target.value.toLowerCase().trim(); renderGrid(); });
+    $('#searchInput').addEventListener('input', (e)=>{
+      FILTER = e.target.value.toLowerCase().trim();
+      render();
+    });
 
-    // ===== LOADERS =====
-    async function loadCats(){ DATA.cats = await http('GET', EP.cats); }
-    async function loadProds(){
-      if(!Array.isArray(DATA.cats)) { try{ await loadCats(); }catch(_){ DATA.cats=[]; } }
-      DATA.prods = await http('GET', EP.prods);
-    }
-    async function loadEvents(){ DATA.events = await http('GET', EP.events); }
-
-    async function reloadCurrent(){
-      if(TAB==='cats') await loadCats();
-      else if(TAB==='prods') await loadProds();
-      else await loadEvents();
-    }
-
-    // ===== RENDER =====
-    function render(){ $('#infoMsg').textContent = ''; renderGrid(); }
-
-    function filtered(list){
-      if(!FILTER) return list;
-      const f = FILTER;
-      return (list||[]).filter(x => (x.name||'').toLowerCase().includes(f));
-    }
-
-    function renderGrid(){
-      const grid = $('#grid'); grid.innerHTML='';
-      let list = TAB==='cats' ? DATA.cats : TAB==='prods' ? DATA.prods : DATA.events;
-      if(!Array.isArray(list)) { grid.innerHTML = `<div class="note">Veri yok.</div>`; return; }
-      list = filtered(list);
-      if(list.length===0){ grid.innerHTML = `<div class="note">Kayıt bulunamadı.</div>`; return; }
-
-      const catMap = new Map((DATA.cats||[]).map(c=>[String(c._id), c.name]));
-
-      list.forEach(obj=>{
-        const img = obj.images?.w640 || obj.imageUrl || '';
-        const title = esc(obj.name||'');
-        let sub = '';
-        if(TAB==='cats'){
-          sub = (obj.kind==='drink'?'İçecek':'Yemek') + (obj.updatedAt? ` · ${new Date(obj.updatedAt).toLocaleDateString('tr-TR')}` : '');
-        } else if(TAB==='prods'){
-          const catName = catMap.get(String(obj.categoryId)) || '';
-          const price = obj.price?.$numberDecimal || obj.price || '';
-          sub = `${price ? fmtMoney(price) : ''}${catName ? ' · '+catName : ''}`;
-        } else {
-          sub = obj.eventDate ? `Tarih: ${fmtDate(obj.eventDate)}` : '';
-        }
-
-        const card = document.createElement('div'); card.className='itm';
-        card.innerHTML = `
-          <img class="thumb" src="${img}" alt="">
-          <div class="itm-body">
-            <div class="title">${title}</div>
-            <div class="muted">${esc(sub)}</div>
-          </div>`;
-        card.addEventListener('click', ()=> openModalForEdit(obj)); // popup edit
-        grid.append(card);
-      });
-    }
+    // ===== ADD BUTTON -> MODAL =====
+    $('#btnAdd').addEventListener('click', ()=> openModalForCreate());
 
     // ===== MODAL =====
-    $('#btnAdd').addEventListener('click', ()=> openModalForCreate());
     const saveBtn = $('#btnSave');
+    const delBtn = $('#btnDelete');
 
     function snapshotForm(){
       return {
@@ -442,33 +459,41 @@
         price: $('#formPrice').value.trim(),
         cat: $('#formCategory').value,
         type: $('#formType').value,
-        eventDate: $('#formEventDate').value,
-        fileSelected: !!($('#formImage').files?.length)
+        fileSelected: !!($('#formImage').files?.[0])
       };
     }
     function hasChanged(a,b){
-      const A = { ...a }, B = { ...b };
-      const fsB = !!B.fileSelected;
+      const A = { ...a }; const B = { ...b };
+      const fsA = !!A.fileSelected; const fsB = !!B.fileSelected;
       delete A.fileSelected; delete B.fileSelected;
-      return JSON.stringify(A) !== JSON.stringify(B) || fsB;
+      return JSON.stringify(A) !== JSON.stringify(B) || fsB; // yeni dosya => değişti kabul
     }
     function validateForm(){
       const s = snapshotForm();
-      if(TAB==='cats'){ return !!s.name && (s.type==='food' || s.type==='drink'); }
-      if(TAB==='prods'){ return !!s.name && !!s.cat && s.price !== '' && !isNaN(parseFloat(s.price)); }
-      if(TAB==='events'){ return !!s.name && !!s.eventDate; }
+      if(TAB==='cats'){
+        return !!s.name && (s.type==='food' || s.type==='drink');
+      }
+      if(TAB==='prods'){
+        return !!s.name && !!s.cat && s.price !== '' && !isNaN(parseFloat(s.price));
+      }
+      if(TAB==='events'){
+        return !!s.name;
+      }
       return false;
     }
-    function setSaveEnabled(on){ if(on) saveBtn.removeAttribute('disabled'); else saveBtn.setAttribute('disabled','disabled'); }
-
+    function setSaveEnabled(on){
+      if(on){ saveBtn.removeAttribute('disabled'); }
+      else  { saveBtn.setAttribute('disabled','disabled'); }
+    }
     function wireFormDirtyWatcher(){
-      ['#formName','#formDesc','#formPrice','#formCategory','#formType','#formEventDate','#formImage'].forEach(sel=>{
-        const n = document.querySelector(sel); if(!n) return;
+      ['#formName','#formDesc','#formPrice','#formCategory','#formType','#formImage'].forEach(sel=>{
+        const n = document.querySelector(sel);
+        if(!n) return;
         const handler = ()=>{
           const now = snapshotForm();
           const isEdit = !!now.id;
           const valid = validateForm();
-          const changed = isEdit ? hasChanged(FORM_SNAPSHOT, now) : valid; // create: valid olmalı
+          const changed = isEdit ? hasChanged(FORM_SNAPSHOT, now) : true;
           setSaveEnabled(valid && changed);
         };
         n.addEventListener('input', handler);
@@ -483,14 +508,13 @@
       $('#formDesc').value = '';
       $('#formPrice').value = '';
       $('#formCategory').innerHTML = '';
-      $('#formEventDate').value = '';
       $('#formImage').value = '';
-      $('#formPreview').src = '';
+      setCropPreviewFromUrl(''); // temizle
+      crop.active = false;
 
       $('#slotType').classList.toggle('hide', TAB!=='cats');
       $('#slotDesc').classList.toggle('hide', TAB==='cats');
       $('#slotPrice').classList.toggle('hide', TAB!=='prods');
-      $('#slotEventDate').classList.toggle('hide', TAB!=='events');
 
       if(TAB==='prods'){
         const cats = DATA.cats || [];
@@ -500,60 +524,190 @@
         });
       }
 
+      delBtn.hidden = true; // yeni kayıtta silme yok
       $('#formMsg').textContent = '';
-      FORM_SNAPSHOT = snapshotForm();        // boş hal
+      FORM_SNAPSHOT = snapshotForm(); // boş hal
       wireFormDirtyWatcher();
-      setSaveEnabled(false);                 // valid olunca açılır
+      setSaveEnabled(false); // tüm zorunlular dolunca açılacak
       $('#modal').classList.add('show');
     }
 
     function openModalForEdit(obj){
       $('#modalTitle').textContent = TAB==='cats' ? 'Kategoriyi Düzenle' : TAB==='prods' ? 'Ürünü Düzenle' : 'Etkinliği Düzenle';
-      $('#formId').value = obj._id || '';
+      $('#formId').value = obj._id;
       $('#formName').value = obj.name || '';
       $('#formDesc').value = obj.description || '';
-      $('#formPrice').value = (TAB==='prods' && (obj.price?.$numberDecimal || obj.price)) ? String(obj.price?.$numberDecimal || obj.price) : '';
+      $('#formPrice').value = (TAB==='prods' && obj.price != null) ? Number(obj.price).toString() : '';
       $('#formImage').value = '';
-      $('#formPreview').src = (obj.images?.w640 || obj.imageUrl || '');
 
       $('#slotType').classList.toggle('hide', TAB!=='cats');
       $('#slotDesc').classList.toggle('hide', TAB==='cats');
       $('#slotPrice').classList.toggle('hide', TAB!=='prods');
-      $('#slotEventDate').classList.toggle('hide', TAB!=='events');
 
-      if(TAB==='cats'){ $('#formType').value = obj.kind || 'food'; }
+      if(TAB==='cats'){ $('#formType').value = (obj.kind || 'food'); }
       if(TAB==='prods'){
         $('#formCategory').innerHTML = '';
         (DATA.cats||[]).forEach(c=>{
-          const o=document.createElement('option'); o.value=c._id; o.textContent=c.name;
+          const o = document.createElement('option'); o.value=c._id; o.textContent=c.name;
           if(String(obj.categoryId)===String(c._id)) o.selected = true;
           $('#formCategory').append(o);
         });
       }
-      if(TAB==='events'){
-        $('#formEventDate').value = obj.eventDate ? toDatetimeLocalValue(obj.eventDate) : '';
-      }
 
+      // mevcut resmi sadece göster (kırpma yeni dosyada aktif)
+      setCropPreviewFromUrl(obj.images?.w640 || obj.imageUrl || '');
+      crop.active = false;
+
+      delBtn.hidden = false; // düzenlemede görünsün
       $('#formMsg').textContent = '';
-      FORM_SNAPSHOT = snapshotForm();        // dolu hal
+      FORM_SNAPSHOT = snapshotForm(); // dolu hal
       wireFormDirtyWatcher();
-      setSaveEnabled(false);                 // değişiklik olunca açılır
+      setSaveEnabled(false); // değişiklik olunca açılacak
       $('#modal').classList.add('show');
     }
 
     document.querySelectorAll('[data-close]').forEach(n=> n.addEventListener('click', ()=> $('#modal').classList.remove('show')));
-    $('#formImage').addEventListener('change', ()=>{
-      const f = $('#formImage').files?.[0];
-      $('#formPreview').src = f ? URL.createObjectURL(f) : '';
+
+    // ===== IMAGE INPUT & CROPPER =====
+    function setCropPreviewFromUrl(url){
+      crop.imgEl.src = url || '';
+      crop.natW = 0; crop.natH = 0;
+      crop.baseScale = 1; crop.zoom = 1; crop.offX = 0; crop.offY = 0;
+      $('#zoomRange').value = '1';
+    }
+
+    function initCropForFile(file){
+      crop.file = file;
+      crop.active = !!file;
+      if(!file){ setCropPreviewFromUrl(''); return; }
+      const reader = new FileReader();
+      reader.onload = () => {
+        crop.imgEl.onload = ()=>{
+          crop.natW = crop.imgEl.naturalWidth;
+          crop.natH = crop.imgEl.naturalHeight;
+          const S = crop.stageEl.getBoundingClientRect().width;
+          crop.baseScale = Math.max(S / crop.natW, S / crop.natH); // cover
+          crop.zoom = 1; crop.offX = 0; crop.offY = 0;
+          $('#zoomRange').value = '1';
+          applyCropTransform();
+        };
+        crop.imgEl.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function applyCropTransform(){
+      const scale = crop.baseScale * crop.zoom;
+      crop.imgEl.style.transform = `translate(-50%,-50%) translate(${crop.offX}px, ${crop.offY}px) scale(${scale})`;
+    }
+
+    function clampOffsets(){
+      const S = crop.stageEl.getBoundingClientRect().width;
+      const scale = crop.baseScale * crop.zoom;
+      const imgW = crop.natW * scale;
+      const imgH = crop.natH * scale;
+      const maxX = Math.max(0, (imgW - S) / 2);
+      const maxY = Math.max(0, (imgH - S) / 2);
+      crop.offX = Math.min(maxX, Math.max(-maxX, crop.offX));
+      crop.offY = Math.min(maxY, Math.max(-maxY, crop.offY));
+    }
+
+    // Drag (pointer) to move
+    (function wireCropDrag(){
+      let dragging = false;
+      let sx=0, sy=0, sox=0, soy=0;
+      const onDown = (e)=>{
+        if(!crop.active) return;
+        dragging = true;
+        const p = (e.touches && e.touches[0]) || e;
+        sx = p.clientX; sy = p.clientY; sox = crop.offX; soy = crop.offY;
+        e.preventDefault();
+      };
+      const onMove = (e)=>{
+        if(!dragging || !crop.active) return;
+        const p = (e.touches && e.touches[0]) || e;
+        crop.offX = sox + (p.clientX - sx);
+        crop.offY = soy + (p.clientY - sy);
+        clampOffsets();
+        applyCropTransform();
+      };
+      const onUp = ()=>{ dragging=false; };
+      crop.stageEl.addEventListener('mousedown', onDown);
+      crop.stageEl.addEventListener('touchstart', onDown, {passive:false});
+      window.addEventListener('mousemove', onMove);
+      window.addEventListener('touchmove', onMove, {passive:false});
+      window.addEventListener('mouseup', onUp);
+      window.addEventListener('touchend', onUp);
+    })();
+
+    $('#zoomRange').addEventListener('input', (e)=>{
+      if(!crop.active) return;
+      const prevZoom = crop.zoom;
+      crop.zoom = Math.max(1, Math.min(3, parseFloat(e.target.value)||1));
+      // merkezde tutmaya çalış → basitçe clamp et
+      clampOffsets();
+      applyCropTransform();
+    });
+    $('#zoomIn').addEventListener('click', ()=>{
+      if(!crop.active) return;
+      const r = $('#zoomRange');
+      r.value = Math.min(3, (parseFloat(r.value)||1) + 0.1).toFixed(2);
+      r.dispatchEvent(new Event('input'));
+    });
+    $('#zoomOut').addEventListener('click', ()=>{
+      if(!crop.active) return;
+      const r = $('#zoomRange');
+      r.value = Math.max(1, (parseFloat(r.value)||1) - 0.1).toFixed(2);
+      r.dispatchEvent(new Event('input'));
+    });
+    $('#cropReset').addEventListener('click', ()=>{
+      if(!crop.active) return;
+      crop.zoom = 1; crop.offX = 0; crop.offY = 0; $('#zoomRange').value='1';
+      applyCropTransform();
     });
 
-    // ===== FORM SUBMIT (Create/Update + Upload) =====
+    $('#formImage').addEventListener('change', ()=>{
+      const f = $('#formImage').files?.[0] || null;
+      initCropForFile(f);
+    });
+
+    async function getCroppedBlobIfAny(){
+      if(!crop.active || !crop.file || crop.natW===0 || crop.natH===0) return null;
+      const S = crop.stageEl.getBoundingClientRect().width;
+      const scale = crop.baseScale * crop.zoom;
+      const imgW = crop.natW * scale;
+      const imgH = crop.natH * scale;
+      const left = (S/2) - (imgW/2) + crop.offX; // image in stage coords
+      const top  = (S/2) - (imgH/2) + crop.offY;
+
+      // Görünen kareyi kaynak piksel koordinatlarına çevir
+      let sx = (-left) / scale;
+      let sy = (-top)  / scale;
+      let sw = S / scale;
+      let sh = S / scale;
+
+      // clamp
+      sx = Math.max(0, Math.min(crop.natW - sw, sx));
+      sy = Math.max(0, Math.min(crop.natH - sh, sy));
+
+      // Çıkış boyutu (isteğe göre büyütülebilir)
+      const OUT = 1024;
+      const canvas = document.createElement('canvas');
+      canvas.width = OUT; canvas.height = OUT;
+      const ctx = canvas.getContext('2d');
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(crop.imgEl, sx, sy, sw, sh, 0, 0, OUT, OUT);
+
+      const type = crop.file.type && /^image\/(png|jpeg|webp)$/i.test(crop.file.type) ? crop.file.type : 'image/jpeg';
+      return new Promise(resolve=> canvas.toBlob(b=> resolve(b), type, 0.92));
+    }
+
+    // ===== FORM SUBMIT (Create/Update + Upload/Crop) =====
     $('#modalForm').addEventListener('submit', async (e)=>{
       e.preventDefault();
       const id = $('#formId').value.trim();
       const name = $('#formName').value.trim();
       const description = $('#formDesc').value.trim();
-      const file = $('#formImage').files?.[0] || null;
       const msg = $('#formMsg');
 
       try{
@@ -564,7 +718,8 @@
           const res = id ? await http('PUT', `${EP.cats}/${id}`, payload)
                          : await http('POST', EP.cats, payload);
           newId = res._id || id;
-          if(file){ const fd=new FormData(); fd.append('file', file); await http('POST', EP.upCat(newId), fd, false); }
+          const blob = await getCroppedBlobIfAny();
+          if(blob){ const fd = new FormData(); fd.append('file', new File([blob], `cat-${newId}.jpg`, {type: blob.type})); await http('POST', EP.upCat(newId), fd, false); }
         }
         else if(TAB==='prods'){
           const price = parseFloat($('#formPrice').value);
@@ -574,29 +729,226 @@
           const res = id ? await http('PUT', `${EP.prods}/${id}`, payload)
                          : await http('POST', EP.prods, payload);
           newId = res._id || id;
-          if(file){ const fd=new FormData(); fd.append('file', file); await http('POST', EP.upProd(newId), fd, false); }
+          const blob = await getCroppedBlobIfAny();
+          if(blob){ const fd = new FormData(); fd.append('file', new File([blob], `prod-${newId}.jpg`, {type: blob.type})); await http('POST', EP.upProd(newId), fd, false); }
         }
-        else { // events
-          const eventLocal = $('#formEventDate').value; // "YYYY-MM-DDTHH:mm"
-          if(!eventLocal) throw new Error('Etkinlik tarihi gerekli');
-          const eventDateISO = new Date(eventLocal).toISOString();
-          const payload = { name, description, eventDate: eventDateISO };
+        else if(TAB==='events'){
+          const payload = { name, description };
           const res = id ? await http('PUT', `${EP.events}/${id}`, payload)
                          : await http('POST', EP.events, payload);
           newId = res._id || id;
-          if(file){ const fd=new FormData(); fd.append('file', file); await http('POST', EP.upEvent(newId), fd, false); }
+          const blob = await getCroppedBlobIfAny();
+          if(blob){ const fd = new FormData(); fd.append('file', new File([blob], `event-${newId}.jpg`, {type: blob.type})); await http('POST', EP.upEvent(newId), fd, false); }
         }
 
         msg.textContent = 'Kaydedildi'; msg.className='note success';
         setSaveEnabled(false);
-        setTimeout(()=> { $('#modal').classList.remove('show'); }, 350);
+        setTimeout(()=> { $('#modal').classList.remove('show'); }, 300);
         await reloadCurrent();
-        renderGrid();
+        render();
       }catch(err){
         msg.textContent = err.message || 'İşlem başarısız';
         msg.className = 'note error';
       }
     });
+
+    // ===== DELETE (with confirm) =====
+    delBtn.addEventListener('click', async ()=>{
+      const id = $('#formId').value.trim();
+      if(!id) return;
+      const ok = await confirmDialog('Bu kaydı silmek istediğinize emin misiniz?');
+      if(!ok) return;
+      const key = TAB2EPKEY[TAB];
+      try{
+        await http('DELETE', `${EP[key]}/${id}`);
+        $('#formMsg').textContent = 'Silindi'; $('#formMsg').className='note success';
+        setTimeout(()=> { $('#modal').classList.remove('show'); }, 300);
+        await reloadCurrent();
+        render();
+      }catch(err){
+        $('#formMsg').textContent = err.message || 'Silme işlemi başarısız';
+        $('#formMsg').className='note error';
+      }
+    });
+
+    // Simple confirm dialog (promise)
+    function confirmDialog(text){
+      return new Promise(resolve=>{
+        $('#confirmText').textContent = text || 'Emin misiniz?';
+        const m = $('#confirmModal'); m.classList.add('show');
+        const off = ()=>{
+          m.classList.remove('show');
+          $('#btnYes').removeEventListener('click', onY);
+          $('#btnNo').removeEventListener('click', onN);
+          m.querySelector('.backdrop').removeEventListener('click', onN);
+        };
+        const onY = ()=>{ off(); resolve(true); };
+        const onN = ()=>{ off(); resolve(false); };
+        $('#btnYes').addEventListener('click', onY);
+        $('#btnNo').addEventListener('click', onN);
+        m.querySelector('.backdrop').addEventListener('click', onN);
+      });
+    }
+
+    // ===== LOADERS =====
+    async function loadCats(){ const arr = await http('GET', EP.cats); DATA.cats = sortStandard(arr); }
+    async function loadProds(){
+      if(DATA.cats.length === 0) { try{ await loadCats(); }catch(_){} }
+      const arr = await http('GET', EP.prods); DATA.prods = sortStandard(arr);
+    }
+    async function loadEvents(){ const arr = await http('GET', EP.events); DATA.events = sortStandard(arr); }
+
+    async function reloadCurrent(){
+      if(TAB==='cats') await loadCats();
+      else if(TAB==='prods') await loadProds();
+      else await loadEvents();
+    }
+
+    // ===== RENDER (with drag&drop sorting) =====
+    function render(){
+      const info = $('#infoMsg');
+      if(FILTER){
+        info.textContent = 'Filtre aktif: Sürükleyerek sıralama devre dışı. Sıralamak için aramayı temizleyin.';
+      }else{
+        info.textContent = 'Kartları sürükleyip bırakarak sıralayabilirsiniz. Sıralama otomatik kaydedilir.';
+      }
+      renderGrid();
+    }
+
+    function filtered(list){
+      if(!FILTER) return list;
+      const f = FILTER;
+      return (list||[]).filter(x => (x.name||'').toLowerCase().includes(f));
+    }
+
+    function renderGrid(){
+      const grid = $('#grid'); grid.innerHTML = '';
+      let list = TAB==='cats' ? DATA.cats : TAB==='prods' ? DATA.prods : DATA.events;
+      const fullList = list; // referans
+      list = filtered(list);
+
+      if(list.length===0){ grid.innerHTML = `<div class="note">Kayıt bulunamadı.</div>`; return; }
+
+      // categoryId -> name haritası
+      const catMap = new Map((DATA.cats||[]).map(c=>[String(c._id), c.name]));
+
+      const toCard = (obj)=>{
+        const img = obj.images?.w640 || obj.imageUrl || '';
+        const title = esc(obj.name||'');
+        let sub = '';
+        if(TAB==='cats') sub = (obj.kind==='drink'?'İçecek':'Yemek') + (obj.updatedAt? ` · ${new Date(obj.updatedAt).toLocaleDateString('tr-TR')}` : '');
+        if(TAB==='prods') sub = `${fmt(obj.price)}${obj.categoryId? ' · '+(catMap.get(String(obj.categoryId)) || ''):''}`;
+        if(TAB==='events') sub = (obj.updatedAt? new Date(obj.updatedAt).toLocaleDateString('tr-TR') : '');
+
+        const card = document.createElement('div'); card.className='itm'; card.draggable = !FILTER;
+        card.dataset.id = obj._id;
+        card.innerHTML = `
+          <img class="thumb" src="${img}" alt="">
+          <div class="itm-body">
+            <div class="title">${title}</div>
+            <div class="muted">${esc(sub)}</div>
+          </div>`;
+        card.addEventListener('click', (ev)=> {
+          // drag sırasında click açılmasın
+          if(card.classList.contains('dragging')) return;
+          openModalForEdit(obj);
+        });
+        return card;
+      };
+      list.forEach(o=> grid.append(toCard(o)));
+
+      if(!FILTER){ enableDragSort(grid, fullList); }
+    }
+
+    function enableDragSort(grid, fullList){
+      let dragEl = null;
+
+      grid.addEventListener('dragstart', (e)=>{
+        const target = e.target.closest('.itm');
+        if(!target) return;
+        dragEl = target;
+        dragEl.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+        // Firefox için gerekli
+        e.dataTransfer.setData('text/plain', dragEl.dataset.id);
+      });
+
+      grid.addEventListener('dragover', (e)=>{
+        e.preventDefault();
+        const after = getInsertBeforeElement(grid, e.clientX, e.clientY, dragEl);
+        if(after == null){
+          grid.appendChild(dragEl);
+        }else{
+          grid.insertBefore(dragEl, after);
+        }
+      });
+
+      grid.addEventListener('drop', async (e)=>{
+        e.preventDefault();
+        if(!dragEl) return;
+        const ids = Array.from(grid.children).map(el=> el.dataset.id);
+        dragEl.classList.remove('dragging');
+        dragEl = null;
+
+        // fullList'i yeni sıraya göre diz
+        const byId = new Map(fullList.map(o=> [String(o._id), o]));
+        const newOrderArr = ids.map(id=> byId.get(String(id))).filter(Boolean);
+        // Replace DATA[TAB]
+        DATA[TAB] = newOrderArr;
+
+        try{
+          await persistOrder(TAB, ids);
+          $('#infoMsg').textContent = 'Sıralama kaydedildi.'; $('#infoMsg').className='note success';
+        }catch(err){
+          $('#infoMsg').textContent = (err && err.message) ? `Sıralama kaydedilemedi: ${err.message}` : 'Sıralama kaydedilemedi';
+          $('#infoMsg').className='note error';
+          // geri yükle
+          await reloadCurrent();
+          render();
+        }
+      });
+
+      grid.addEventListener('dragend', ()=>{
+        if(dragEl){ dragEl.classList.remove('dragging'); dragEl = null; }
+      });
+    }
+
+    function getInsertBeforeElement(container, x, y, draggingEl){
+      const els = [...container.querySelectorAll('.itm:not(.dragging)')];
+      // En yakın "sonrası" elemanı bul
+      let closest = null;
+      let closestDist = Number.NEGATIVE_INFINITY;
+      for(const el of els){
+        const rect = el.getBoundingClientRect();
+        // grid olduğu için hem X hem Y ekseni düşünelim → merkezine göre offset
+        const offset = (y - rect.top - rect.height/2) + (x - rect.left - rect.width/2) * 0.1; // yatay küçük ağırlık
+        if(offset < 0 && offset > closestDist){
+          closestDist = offset; closest = el;
+        }
+      }
+      return closest; // null ise sona eklenir
+    }
+
+    async function persistOrder(tab, ids){
+      // Önce toplu endpointi dene
+      const key = TAB2REORDER[tab];
+      const url = EP[key];
+      try{
+        await http('POST', url, { ids });
+        return;
+      }catch(_){ /* fallback'e düş */ }
+
+      // Fallback: sırayı tek tek kaydet (order alanı)
+      const base = EP[TAB2EPKEY[tab]];
+      await Promise.all(ids.map((id, idx)=> http('PUT', `${base}/${id}`, { order: idx })));
+    }
+
+    // ==== UTILS ====
+    function currentList(){
+      return TAB==='cats' ? DATA.cats : TAB==='prods' ? DATA.prods : DATA.events;
+    }
+
+    // ====== END ======
   </script>
 </body>
 </html>
