@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="tr" class="light" style="color-scheme: light;">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+  <title>Üsküdar Sahne Menü</title>
+
+  <!-- CSS / Assets -->
+  <link rel="stylesheet" href="https://qrmenu-cdn.b-cdn.net/css/1.css" data-precedence="next" />
+  <link rel="stylesheet" href="https://qrmenu-cdn.b-cdn.net/css/2.css" data-precedence="next" />
+  <link rel="preload" href="https://qrmenu-cdn.b-cdn.net/fonts/e4af272ccee01ff0-s.p.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="icon" href="/favicon.ico" type="image/x-icon" sizes="32x32" />
+  <meta name="description" content="Üsküdar Sahne Menü" />
+  <meta name="next-size-adjust"/>
+
+  <style>
+    /* Üst şerit yatay scroll alanı */
+    .scroll-area [data-radix-scroll-area-viewport] {
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      -webkit-overflow-scrolling: touch;
+    }
+    .scroll-area [data-radix-scroll-area-viewport]::-webkit-scrollbar { display: none; }
+    .scroll-area :where([data-radix-scroll-area-viewport]) { display: flex; flex-direction: column; align-items: stretch; }
+    .scroll-area :where([data-radix-scroll-area-content]) { flex-grow: 1; }
+    /* Bölüm başlıkları scroll hedefi olduğunda üstte biraz pay bıraksın */
+    .cat-section { scroll-margin-top: 12px; }
+    /* Aktif/pasif kategori sekmesi */
+    .cat-tab { transition: color .2s ease; }
+    .cat-tab[data-active="true"] { color: var(--qrblue, #2563eb); font-weight: 600; }
+    .cat-tab[data-active="false"] { color: #000; font-weight: 300; }
+  </style>
+</head>
+<body>
+  <div class="__className_e8ce0c">
+    <div class="min-h-screen w-full max-w-[500px] md:justify-self-center bg-qrbackground pb-7 mx-auto">
+
+      <!-- ÜST YATAY KATEGORİ ŞERİDİ (dinamik) -->
+      <div class="container mx-auto mb-3 px-3">
+        <div dir="ltr" class="relative w-full whitespace-nowrap mb-0 overflow-hidden scroll-area"
+             style="position: relative; --radix-scroll-area-corner-width: 0px; --radix-scroll-area-corner-height: 0px;">
+          <div data-radix-scroll-area-viewport class="h-fit w-full rounded-[inherit]" style="overflow: scroll;">
+            <div data-radix-scroll-area-content style="min-width: fit-content;">
+              <div id="categoryBar" class="flex w-max space-x-1 p-0 pt-1"><!-- JS dolduracak --></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TÜM KATEGORİ+ÜRÜNLER (dinamik) -->
+      <div class="menu-items px-3" id="menuRoot"><!-- JS dolduracak --></div>
+   
+    </div>
+  </div>
+
+  <!-- ==== DATA BINDING (API -> UI) ==== -->
+  <script>
+    const API_BASE = "https://uskudarsahne-api.onrender.com";
+    const FALLBACK_IMG = "https://qrmenu-cdn.b-cdn.net/assets/header.jpg";
+
+    // Türkçe slug
+    function slugifyTR(str=''){
+      const map = { 'Ç':'C','Ö':'O','Ş':'S','İ':'I','I':'I','Ü':'U','Ğ':'G','ç':'c','ö':'o','ş':'s','ı':'i','i':'i','ü':'u','ğ':'g' };
+      return String(str).split('').map(ch => map[ch] || ch)
+        .join('').toLowerCase().replace(/[^a-z0-9\s-]/g,'')
+        .trim().replace(/\s+/g,'-').replace(/-+/g,'-');
+    }
+    const escAttr = s => String(s).replace(/"/g,'&quot;');
+
+    async function fetchJSON(url){
+      try{
+        const res = await fetch(url, { credentials: 'omit' });
+        if(!res.ok) throw new Error(`${res.status}`);
+        return await res.json();
+      }catch(e){
+        console.error("[API ERROR]", url, e);
+        return null;
+      }
+    }
+
+    function priceToNumber(p){
+      if (p == null) return null;
+      if (typeof p === 'number') return p;
+      if (typeof p === 'string') return parseFloat(p.replace(',', '.'));
+      if (typeof p === 'object' && p.$numberDecimal) return parseFloat(p.$numberDecimal);
+      try { return parseFloat(p); } catch { return null; }
+    }
+    function formatTRY(p){
+      const n = priceToNumber(p);
+      if (isNaN(n) || n == null) return '';
+      return n.toLocaleString('tr-TR', { style: 'currency', currency: 'TRY', minimumFractionDigits: 2 });
+    }
+
+    // --- UI Renderers ---
+    function renderCategoryTabs(categories){
+      const bar = document.getElementById('categoryBar');
+      bar.innerHTML = '';
+      for(const c of categories){
+        const slug = slugifyTR(c.name||'');
+        const img  = (c.images && (c.images.w640 || c.images.w1024)) || FALLBACK_IMG;
+        const el = document.createElement('div');
+        el.className = 'w-[109px] border-hidden cursor-pointer';
+        el.setAttribute('role','link');
+        el.dataset.slug = slug;
+        el.innerHTML = `
+          <div class="h-[84px] pt-1 line-clamp-1">
+            <img alt="${escAttr(c.name)}" loading="lazy" width="1920" height="1080" decoding="async"
+                 class="w-full h-full object-cover rounded-t-sm"
+                 src="${img}" style="color: transparent;"/>
+          </div>
+          <div class="p-1.5 bg-black/10 bg-black/30 rounded-b-sm">
+            <h3 class="text-[11px] leading-tight tracking-tight text-center line-clamp-1">
+              <span class="cat-tab" data-active="false">${c.name||''}</span>
+            </h3>
+          </div>`;
+        el.addEventListener('click', ()=> scrollToCategory(slug));
+        bar.appendChild(el);
+      }
+    }
+
+    function productCardHTML(p){
+      const img = (p.images && (p.images.w640 || p.images.w1024)) || FALLBACK_IMG;
+      const name = p.name || '';
+      const desc = p.description || '';
+      const priceText = formatTRY(p.price);
+      return `
+      <div class="">
+        <div class="relative">
+          <div class="bg-qrborder/0 border-none rounded-sm cursor-pointer">
+            <div class="p-0 flex">
+              <div class="w-[50%] aspect-[4/3] flex-shrink-0 relative">
+                <img alt="${escAttr(name)}" loading="lazy" width="1920" height="1080" decoding="async"
+                     class="w-full h-full object-cover rounded-sm" src="${img}" style="color: transparent;"/>
+                <div class="absolute top-1.5 right-1.5 flex flex-row gap-1.5"></div>
+              </div>
+              <div class="w-[50%] flex flex-col justify-between py-1.5 pl-2.5">
+                <div>
+                  <div class="flex items-start space-x-2">
+                    <h3 class="text-sm font-normal line-clamp-1">${name}</h3>
+                  </div>
+                  <p class="text-[11px] mt-1 text-gray-700 line-clamp-4 font-light">${escAttr(desc)}</p>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <span class="font-light text-[13px] whitespace-nowrap"><span>${priceText}</span></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>`;
+    }
+
+    function categorySectionHTML(cat){
+      const slug = slugifyTR(cat.name||'');
+      return `
+      <section id="category-${slug}" class="cat-section">
+        <div class="flex flex-col items-center mb-3 mt-3">
+          <div class="bg-qrborder2 p-2 rounded-sm flex w-full items-center justify-center">
+            <p class="text-[14px] font-light tracking-wider text-center overflow-hidden text-ellipsis">
+              ${cat.name||''}
+            </p>
+          </div>
+        </div>
+        <div class="grid gap-2.5 grid-cols-1" id="grid-${slug}">
+          <!-- ürünler gelecek -->
+        </div>
+      </section>`;
+    }
+
+    function renderAllSections(categories){
+      const root = document.getElementById('menuRoot');
+      root.innerHTML = '';
+      for (const c of categories) {
+        root.insertAdjacentHTML('beforeend', categorySectionHTML(c));
+      }
+    }
+
+    async function fillProductsFor(categories){
+      // Hepsini çek -> sırayla bas
+      await Promise.all(categories.map(async c=>{
+        const slug = slugifyTR(c.name||'');
+        const grid = document.getElementById(`grid-${slug}`);
+        const list = await fetchJSON(`${API_BASE}/api/products?categoryId=${encodeURIComponent(c._id)}&limit=500`);
+        if (!Array.isArray(list) || list.length===0){
+          grid.innerHTML = `<div class="text-center text-xs opacity-70 py-4">Bu kategoride ürün yok.</div>`;
+          return;
+        }
+        // Basit isim sıralama (TR)
+        list.sort((a,b)=> String(a.name||'').localeCompare(String(b.name||''), 'tr'));
+        grid.innerHTML = list.map(productCardHTML).join('');
+      }));
+    }
+
+    // --- Scroll & Active Tab ---
+    function scrollToCategory(slug){
+      const sec = document.getElementById(`category-${slug}`);
+      if (!sec) return;
+      sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // Üst şeritte ilgili tab'ı görünür yap
+      const tab = [...document.querySelectorAll('#categoryBar > div')].find(d => d.dataset.slug === slug);
+      if (tab) tab.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+      // URL güncelle (sayfa yenilenmeden)
+      const params = new URLSearchParams(location.search);
+      params.set('category', slug);
+      history.replaceState(null, '', `${location.pathname}?${params.toString()}`);
+    }
+
+    function setActiveSlug(slug){
+      document.querySelectorAll('.cat-tab').forEach(el => el.setAttribute('data-active','false'));
+      const active = document.querySelector(`#categoryBar > div[data-slug="${slug}"] .cat-tab`);
+      if (active) active.setAttribute('data-active','true');
+    }
+
+    function attachActiveObserver(categories){
+      const mapSlugToEl = new Map();
+      categories.forEach(c=>{
+        const slug = slugifyTR(c.name||'');
+        const sec = document.getElementById(`category-${slug}`);
+        if (sec) mapSlugToEl.set(slug, sec);
+      });
+
+      let current = null;
+      const obs = new IntersectionObserver((entries)=>{
+        // Görünür olanlardan en üstte olanı seçelim
+        const visible = entries.filter(e=> e.isIntersecting).sort((a,b)=> a.boundingClientRect.top - b.boundingClientRect.top);
+        if (visible.length){
+          const id = visible[0].target.id; // "category-<slug>"
+          const slug = id.replace(/^category-/, '');
+          if (slug !== current){
+            current = slug;
+            setActiveSlug(slug);
+          }
+        }
+      }, { root: null, threshold: 0.5 });
+
+      for (const [,sec] of mapSlugToEl) obs.observe(sec);
+
+      // İlk yüklemede URL'den gelmişse onu aktifle
+      const initial = new URLSearchParams(location.search).get('category');
+      if (initial && mapSlugToEl.has(initial)) {
+        setActiveSlug(initial);
+        // küçük gecikmeyle kaydır (DOM yerleşsin)
+        setTimeout(()=> scrollToCategory(initial), 50);
+      } else {
+        // ilk kategoriyi aktif yap
+        const first = categories.length ? slugifyTR(categories[0].name||'') : null;
+        if (first) setActiveSlug(first);
+      }
+    }
+
+    // ---- BOOT ----
+    document.addEventListener('DOMContentLoaded', async ()=>{
+      const categories = await fetchJSON(`${API_BASE}/api/categories`);
+      if (!Array.isArray(categories) || categories.length===0){
+        document.getElementById('menuRoot').innerHTML =
+          `<div class="text-center text-xs opacity-70 py-6">Kategori bulunamadı.</div>`;
+        return;
+      }
+      renderCategoryTabs(categories);
+      renderAllSections(categories);
+      await fillProductsFor(categories);
+      attachActiveObserver(categories);
+    });
+  </script>
+</body>
+</html>
