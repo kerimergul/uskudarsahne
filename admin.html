@@ -64,7 +64,7 @@
     .card{ background:var(--card); border:1px solid var(--stroke); border-radius:14px; padding:16px; }
     .toolrow{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
     .toolrow .grow{ flex:1; min-width:220px; }
-    input[type="search"], input[type="text"], input[type="number"], textarea, select{
+    input[type="search"], input[type="text"], input[type="number"], input[type="datetime-local"], textarea, select{
       width:100%; padding:10px 12px; background:#0f1320; color:var(--text); border:1px solid #2a2f45; border-radius:10px; outline:none;
     }
     .note{ font-size:12px; color:#aab; margin-top:8px; }
@@ -247,6 +247,14 @@
           </div>
         </div>
 
+        <!-- SADECE ETKİNLİKLER: TARİH/SAAT -->
+        <div id="slotEventDate" class="row hide">
+          <div>
+            <label for="formEventDate">Etkinlik Tarihi</label>
+            <input id="formEventDate" type="datetime-local" />
+          </div>
+        </div>
+
         <div class="row">
           <div>
             <label for="formImage">Görsel</label>
@@ -292,7 +300,6 @@
 
   <script>
     // ===== CONFIG =====
-    // TODO: burayı kendi API domaininle güncelle:
     const API_BASE = "https://uskudarsahne-api.onrender.com";
     const EP = {
       login:  API_BASE + "/api/auth/login",
@@ -304,7 +311,6 @@
       upCat:  id => API_BASE + `/api/admin/upload/categories/${id}`,
       upProd: id => API_BASE + `/api/admin/upload/products/${id}`,
       upEvent:id => API_BASE + `/api/admin/upload/events/${id}`,
-      // Toplu sıralama kaydı için önerilen endpointler (varsa kullanır; yoksa fallback tek tek order alanı günceller)
       reorderCat:  API_BASE + "/api/admin/categories/reorder",
       reorderProd: API_BASE + "/api/admin/products/reorder",
       reorderEvent:API_BASE + "/api/admin/events/reorder",
@@ -317,19 +323,21 @@
     let TAB = "cats";           // cats | prods | events
     let DATA = { cats:[], prods:[], events:[] };
     let FILTER = "";
-    let FORM_SNAPSHOT = null;   // modal ilk hali
+    let FORM_SNAPSHOT = null;
 
     // Cropper state
     const crop = {
-      file: null,               // File (varsa)
-      imgEl: $('#cropImg'),
-      stageEl: $('#cropStage'),
+      file: null,
+      imgEl: null,
+      stageEl: null,
       natW: 0, natH:0,
       baseScale: 1,
       zoom: 1,
       offX: 0, offY: 0,
-      active: false,            // yeni dosya seçildiyse true
+      active: false,
     };
+    crop.imgEl = document.getElementById('cropImg');
+    crop.stageEl = document.getElementById('cropStage');
 
     // ===== HELPERS =====
     function setStatus(t){ $('#status').textContent = t; }
@@ -359,10 +367,29 @@
       return TAB==='cats' ? 'Kategoriler' : TAB==='prods' ? 'Ürünler' : 'Etkinlikler';
     }
 
-    // sort helper (order -> name fallback)
     function sortStandard(arr){
       const getOrd = o => (typeof o.order==='number' ? o.order : Number.MAX_SAFE_INTEGER);
       return arr.sort((a,b)=> getOrd(a)-getOrd(b) || (a.name||'').localeCompare(b.name||'', 'tr'));
+    }
+
+    // Date helpers for eventDate
+    function toDatetimeLocalValue(dateStr){
+      if(!dateStr) return '';
+      const d = new Date(dateStr);
+      if(isNaN(d)) return '';
+      const pad = n => String(n).padStart(2,'0');
+      const yyyy = d.getFullYear();
+      const mm = pad(d.getMonth()+1);
+      const dd = pad(d.getDate());
+      const hh = pad(d.getHours());
+      const mi = pad(d.getMinutes());
+      return `${yyyy}-${mm}-${dd}T${hh}:${mi}`;
+    }
+    function formatEventDate(val){
+      if(!val) return '';
+      const d = new Date(val);
+      if(isNaN(d)) return esc(val);
+      return d.toLocaleString('tr-TR', { dateStyle:'medium', timeStyle:'short' });
     }
 
     // ===== AUTH =====
@@ -392,7 +419,7 @@
       location.reload();
     });
 
-    // BOOT: aktif session var mı?
+    // BOOT
     (async function boot(){
       try{
         const me = await http('GET', EP.me);
@@ -433,7 +460,7 @@
         $('#searchInput').value = '';
         FILTER = '';
         closeSidebar();
-        await reloadCurrent(); // sadece seçili sekmeyi çek
+        await reloadCurrent();
         render();
       });
     });
@@ -459,6 +486,7 @@
         price: $('#formPrice').value.trim(),
         cat: $('#formCategory').value,
         type: $('#formType').value,
+        eventDate: $('#formEventDate') ? $('#formEventDate').value : '',
         fileSelected: !!($('#formImage').files?.[0])
       };
     }
@@ -466,7 +494,7 @@
       const A = { ...a }; const B = { ...b };
       const fsA = !!A.fileSelected; const fsB = !!B.fileSelected;
       delete A.fileSelected; delete B.fileSelected;
-      return JSON.stringify(A) !== JSON.stringify(B) || fsB; // yeni dosya => değişti kabul
+      return JSON.stringify(A) !== JSON.stringify(B) || fsB;
     }
     function validateForm(){
       const s = snapshotForm();
@@ -477,6 +505,7 @@
         return !!s.name && !!s.cat && s.price !== '' && !isNaN(parseFloat(s.price));
       }
       if(TAB==='events'){
+        // Sadece isim zorunlu; dilersen eventDate zorunlu yapabilirsin: && !!s.eventDate
         return !!s.name;
       }
       return false;
@@ -486,7 +515,7 @@
       else  { saveBtn.setAttribute('disabled','disabled'); }
     }
     function wireFormDirtyWatcher(){
-      ['#formName','#formDesc','#formPrice','#formCategory','#formType','#formImage'].forEach(sel=>{
+      ['#formName','#formDesc','#formPrice','#formCategory','#formType','#formImage','#formEventDate'].forEach(sel=>{
         const n = document.querySelector(sel);
         if(!n) return;
         const handler = ()=>{
@@ -501,6 +530,13 @@
       });
     }
 
+    function toggleSlots(){
+      $('#slotType').classList.toggle('hide', TAB!=='cats');
+      $('#slotDesc').classList.toggle('hide', TAB==='cats');
+      $('#slotPrice').classList.toggle('hide', TAB!=='prods');
+      $('#slotEventDate').classList.toggle('hide', TAB!=='events');
+    }
+
     function openModalForCreate(){
       $('#modalTitle').textContent = TAB==='cats' ? 'Yeni Kategori' : TAB==='prods' ? 'Yeni Ürün' : 'Yeni Etkinlik';
       $('#formId').value = '';
@@ -509,12 +545,9 @@
       $('#formPrice').value = '';
       $('#formCategory').innerHTML = '';
       $('#formImage').value = '';
-      setCropPreviewFromUrl(''); // temizle
-      crop.active = false;
+      if($('#formEventDate')) $('#formEventDate').value = '';
 
-      $('#slotType').classList.toggle('hide', TAB!=='cats');
-      $('#slotDesc').classList.toggle('hide', TAB==='cats');
-      $('#slotPrice').classList.toggle('hide', TAB!=='prods');
+      toggleSlots();
 
       if(TAB==='prods'){
         const cats = DATA.cats || [];
@@ -524,11 +557,13 @@
         });
       }
 
-      delBtn.hidden = true; // yeni kayıtta silme yok
+      setCropPreviewFromUrl(''); crop.active = false;
+
+      delBtn.hidden = true;
       $('#formMsg').textContent = '';
-      FORM_SNAPSHOT = snapshotForm(); // boş hal
+      FORM_SNAPSHOT = snapshotForm();
       wireFormDirtyWatcher();
-      setSaveEnabled(false); // tüm zorunlular dolunca açılacak
+      setSaveEnabled(false);
       $('#modal').classList.add('show');
     }
 
@@ -540,9 +575,7 @@
       $('#formPrice').value = (TAB==='prods' && obj.price != null) ? Number(obj.price).toString() : '';
       $('#formImage').value = '';
 
-      $('#slotType').classList.toggle('hide', TAB!=='cats');
-      $('#slotDesc').classList.toggle('hide', TAB==='cats');
-      $('#slotPrice').classList.toggle('hide', TAB!=='prods');
+      toggleSlots();
 
       if(TAB==='cats'){ $('#formType').value = (obj.kind || 'food'); }
       if(TAB==='prods'){
@@ -553,16 +586,18 @@
           $('#formCategory').append(o);
         });
       }
+      if(TAB==='events' && $('#formEventDate')){
+        $('#formEventDate').value = toDatetimeLocalValue(obj.eventDate);
+      }
 
-      // mevcut resmi sadece göster (kırpma yeni dosyada aktif)
       setCropPreviewFromUrl(obj.images?.w640 || obj.imageUrl || '');
       crop.active = false;
 
-      delBtn.hidden = false; // düzenlemede görünsün
+      delBtn.hidden = false;
       $('#formMsg').textContent = '';
-      FORM_SNAPSHOT = snapshotForm(); // dolu hal
+      FORM_SNAPSHOT = snapshotForm();
       wireFormDirtyWatcher();
-      setSaveEnabled(false); // değişiklik olunca açılacak
+      setSaveEnabled(false);
       $('#modal').classList.add('show');
     }
 
@@ -586,7 +621,7 @@
           crop.natW = crop.imgEl.naturalWidth;
           crop.natH = crop.imgEl.naturalHeight;
           const S = crop.stageEl.getBoundingClientRect().width;
-          crop.baseScale = Math.max(S / crop.natW, S / crop.natH); // cover
+          crop.baseScale = Math.max(S / crop.natW, S / crop.natH);
           crop.zoom = 1; crop.offX = 0; crop.offY = 0;
           $('#zoomRange').value = '1';
           applyCropTransform();
@@ -612,7 +647,6 @@
       crop.offY = Math.min(maxY, Math.max(-maxY, crop.offY));
     }
 
-    // Drag (pointer) to move
     (function wireCropDrag(){
       let dragging = false;
       let sx=0, sy=0, sox=0, soy=0;
@@ -642,11 +676,8 @@
 
     $('#zoomRange').addEventListener('input', (e)=>{
       if(!crop.active) return;
-      const prevZoom = crop.zoom;
       crop.zoom = Math.max(1, Math.min(3, parseFloat(e.target.value)||1));
-      // merkezde tutmaya çalış → basitçe clamp et
-      clampOffsets();
-      applyCropTransform();
+      clampOffsets(); applyCropTransform();
     });
     $('#zoomIn').addEventListener('click', ()=>{
       if(!crop.active) return;
@@ -677,20 +708,17 @@
       const scale = crop.baseScale * crop.zoom;
       const imgW = crop.natW * scale;
       const imgH = crop.natH * scale;
-      const left = (S/2) - (imgW/2) + crop.offX; // image in stage coords
+      const left = (S/2) - (imgW/2) + crop.offX;
       const top  = (S/2) - (imgH/2) + crop.offY;
 
-      // Görünen kareyi kaynak piksel koordinatlarına çevir
       let sx = (-left) / scale;
       let sy = (-top)  / scale;
       let sw = S / scale;
       let sh = S / scale;
 
-      // clamp
       sx = Math.max(0, Math.min(crop.natW - sw, sx));
       sy = Math.max(0, Math.min(crop.natH - sh, sy));
 
-      // Çıkış boyutu (isteğe göre büyütülebilir)
       const OUT = 1024;
       const canvas = document.createElement('canvas');
       canvas.width = OUT; canvas.height = OUT;
@@ -702,7 +730,7 @@
       return new Promise(resolve=> canvas.toBlob(b=> resolve(b), type, 0.92));
     }
 
-    // ===== FORM SUBMIT (Create/Update + Upload/Crop) =====
+    // ===== FORM SUBMIT =====
     $('#modalForm').addEventListener('submit', async (e)=>{
       e.preventDefault();
       const id = $('#formId').value.trim();
@@ -733,7 +761,10 @@
           if(blob){ const fd = new FormData(); fd.append('file', new File([blob], `prod-${newId}.jpg`, {type: blob.type})); await http('POST', EP.upProd(newId), fd, false); }
         }
         else if(TAB==='events'){
-          const payload = { name, description };
+          const eventDateRaw = $('#formEventDate').value; // "YYYY-MM-DDTHH:mm" (local)
+          // Backend ISO istiyorsa şunu kullan: const eventDate = eventDateRaw ? new Date(eventDateRaw).toISOString() : null;
+          const eventDate = eventDateRaw || null;
+          const payload = { name, description, eventDate };
           const res = id ? await http('PUT', `${EP.events}/${id}`, payload)
                          : await http('POST', EP.events, payload);
           newId = res._id || id;
@@ -771,7 +802,6 @@
       }
     });
 
-    // Simple confirm dialog (promise)
     function confirmDialog(text){
       return new Promise(resolve=>{
         $('#confirmText').textContent = text || 'Emin misiniz?';
@@ -804,7 +834,7 @@
       else await loadEvents();
     }
 
-    // ===== RENDER (with drag&drop sorting) =====
+    // ===== RENDER =====
     function render(){
       const info = $('#infoMsg');
       if(FILTER){
@@ -824,12 +854,11 @@
     function renderGrid(){
       const grid = $('#grid'); grid.innerHTML = '';
       let list = TAB==='cats' ? DATA.cats : TAB==='prods' ? DATA.prods : DATA.events;
-      const fullList = list; // referans
+      const fullList = list;
       list = filtered(list);
 
       if(list.length===0){ grid.innerHTML = `<div class="note">Kayıt bulunamadı.</div>`; return; }
 
-      // categoryId -> name haritası
       const catMap = new Map((DATA.cats||[]).map(c=>[String(c._id), c.name]));
 
       const toCard = (obj)=>{
@@ -838,7 +867,10 @@
         let sub = '';
         if(TAB==='cats') sub = (obj.kind==='drink'?'İçecek':'Yemek') + (obj.updatedAt? ` · ${new Date(obj.updatedAt).toLocaleDateString('tr-TR')}` : '');
         if(TAB==='prods') sub = `${fmt(obj.price)}${obj.categoryId? ' · '+(catMap.get(String(obj.categoryId)) || ''):''}`;
-        if(TAB==='events') sub = (obj.updatedAt? new Date(obj.updatedAt).toLocaleDateString('tr-TR') : '');
+        if(TAB==='events'){
+          const when = formatEventDate(obj.eventDate) || (obj.updatedAt? new Date(obj.updatedAt).toLocaleDateString('tr-TR') : '');
+          sub = when;
+        }
 
         const card = document.createElement('div'); card.className='itm'; card.draggable = !FILTER;
         card.dataset.id = obj._id;
@@ -849,7 +881,6 @@
             <div class="muted">${esc(sub)}</div>
           </div>`;
         card.addEventListener('click', (ev)=> {
-          // drag sırasında click açılmasın
           if(card.classList.contains('dragging')) return;
           openModalForEdit(obj);
         });
@@ -869,7 +900,6 @@
         dragEl = target;
         dragEl.classList.add('dragging');
         e.dataTransfer.effectAllowed = 'move';
-        // Firefox için gerekli
         e.dataTransfer.setData('text/plain', dragEl.dataset.id);
       });
 
@@ -890,10 +920,8 @@
         dragEl.classList.remove('dragging');
         dragEl = null;
 
-        // fullList'i yeni sıraya göre diz
         const byId = new Map(fullList.map(o=> [String(o._id), o]));
         const newOrderArr = ids.map(id=> byId.get(String(id))).filter(Boolean);
-        // Replace DATA[TAB]
         DATA[TAB] = newOrderArr;
 
         try{
@@ -902,7 +930,6 @@
         }catch(err){
           $('#infoMsg').textContent = (err && err.message) ? `Sıralama kaydedilemedi: ${err.message}` : 'Sıralama kaydedilemedi';
           $('#infoMsg').className='note error';
-          // geri yükle
           await reloadCurrent();
           render();
         }
@@ -913,42 +940,37 @@
       });
     }
 
-    function getInsertBeforeElement(container, x, y, draggingEl){
+    function getInsertBeforeElement(container, x, y){
       const els = [...container.querySelectorAll('.itm:not(.dragging)')];
-      // En yakın "sonrası" elemanı bul
       let closest = null;
       let closestDist = Number.NEGATIVE_INFINITY;
       for(const el of els){
         const rect = el.getBoundingClientRect();
-        // grid olduğu için hem X hem Y ekseni düşünelim → merkezine göre offset
-        const offset = (y - rect.top - rect.height/2) + (x - rect.left - rect.width/2) * 0.1; // yatay küçük ağırlık
+        const offset = (y - rect.top - rect.height/2) + (x - rect.left - rect.width/2) * 0.1;
         if(offset < 0 && offset > closestDist){
           closestDist = offset; closest = el;
         }
       }
-      return closest; // null ise sona eklenir
+      return closest;
     }
 
     async function persistOrder(tab, ids){
-      // Önce toplu endpointi dene
       const key = TAB2REORDER[tab];
       const url = EP[key];
       try{
         await http('POST', url, { ids });
         return;
-      }catch(_){ /* fallback'e düş */ }
-
-      // Fallback: sırayı tek tek kaydet (order alanı)
+      }catch(_){ /* fallback */ }
       const base = EP[TAB2EPKEY[tab]];
       await Promise.all(ids.map((id, idx)=> http('PUT', `${base}/${id}`, { order: idx })));
     }
 
-    // ==== UTILS ====
-    function currentList(){
-      return TAB==='cats' ? DATA.cats : TAB==='prods' ? DATA.prods : DATA.events;
+    // ===== INIT =====
+    function setCropperRefs(){
+      crop.imgEl = document.getElementById('cropImg');
+      crop.stageEl = document.getElementById('cropStage');
     }
-
-    // ====== END ======
+    setCropperRefs();
   </script>
 </body>
 </html>
