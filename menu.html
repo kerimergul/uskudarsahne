@@ -34,7 +34,23 @@
     .cat-tab[data-active="false"] { color: #000; font-weight: 300; }
 
     
-    /* ====== Sticky Kategori Bar ====== */
+    /* ====== Sticky Kategori Bar (two-state, no animation) ====== */
+    .catbar {
+      position: sticky; top: 0; z-index: 1000;
+      background: rgba(255,255,255,0.95);
+      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(8px);
+      /* no transitions to avoid in-between states */
+    }
+    .catbar .thumbWrap { display: block; }
+    .catbar.compact .thumbWrap { display: none; } /* hide images completely */
+    .catbar .tabText { padding: 6px 8px; }
+    .catbar.compact .tabText { padding: 8px 10px; }
+    .catbar.compact .cat-tab { font-size: 12px; }
+    /* item width: normal 109px, compact fits text */
+    #categoryBar > div { width: 109px; }
+    .catbar.compact #categoryBar > div { width: auto !important; }
+
     .catbar {
       position: sticky; top: 0; z-index: 1000;
       background: rgba(255,255,255,0.85);
@@ -343,7 +359,7 @@
       const y = window.scrollY || document.documentElement.scrollTop || 0;
       const catArea = document.getElementById('catArea');
       const btnTop = document.getElementById('btnTop');
-      const compactOn = y > 8;
+      const compactOn = y > 0; // strictly: top vs not-top
       catArea.classList.toggle('compact', compactOn);
       btnTop.classList.toggle('show', y > 250);
     }
