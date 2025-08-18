@@ -33,43 +33,25 @@
     .cat-tab[data-active="true"] { color: var(--qrblue, #2563eb); font-weight: 600; }
     .cat-tab[data-active="false"] { color: #000; font-weight: 300; }
 
-    
-    /* ====== Sticky Kategori Bar (two-state, no animation) ====== */
+    /* ====== Sticky Kategori Bar (two-state, no animation, fixed) ====== */
     .catbar {
-      position: sticky; top: 0; z-index: 1000;
+      position: fixed;
+      top: env(safe-area-inset-top, 0);
+      left: 0; right: 0;
+      z-index: 1000;
       background: rgba(255,255,255,0.95);
       -webkit-backdrop-filter: blur(8px);
       backdrop-filter: blur(8px);
-      /* no transitions to avoid in-between states */
     }
+    /* İçeriği ortalamak için iç container zaten max-w-[500px] ve mx-auto */
     .catbar .thumbWrap { display: block; }
-    .catbar.compact .thumbWrap { display: none; } /* hide images completely */
+    .catbar.compact .thumbWrap { display: none; } /* resimleri tamamen gizle */
     .catbar .tabText { padding: 6px 8px; }
     .catbar.compact .tabText { padding: 8px 10px; }
     .catbar.compact .cat-tab { font-size: 12px; }
-    /* item width: normal 109px, compact fits text */
+    /* item genişliği: normal 109px, compact metne göre */
     #categoryBar > div { width: 109px; }
     .catbar.compact #categoryBar > div { width: auto !important; }
-
-    .catbar {
-      position: sticky; top: 0; z-index: 1000;
-      background: rgba(255,255,255,0.85);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      transition: padding .2s ease, box-shadow .2s ease, background .2s ease;
-      padding: 4px 0;
-    }
-    .catbar.compact { box-shadow: 0 2px 10px rgba(0,0,0,.06); padding: 2px 0; min-height: 38px; }
-    .catbar .thumbWrap { height: 84px; overflow: hidden; transition: height .22s ease, padding .22s ease; }
-    .catbar.compact .thumbWrap { height: 0; padding-top: 0; }
-    .catbar .tabText { padding: 6px 8px; transition: padding .2s ease, background .2s ease; }
-    .catbar.compact .tabText { padding: 6px 10px; background: transparent; }
-    .catbar.compact .cat-tab { font-size: 12px; }
-
-    /* Her item genişliği: normalde 109px, compact'ta metne göre (auto) */
-    #categoryBar > div { width: 109px; }
-    .catbar.compact #categoryBar > div { width: auto !important; }
-
 
     /* ====== Lazy image (placeholder) ====== */
     .lazy-img {
@@ -104,7 +86,7 @@
   <div class="__className_e8ce0c">
     <div class="min-h-screen w-full max-w-[500px] md:justify-self-center bg-qrbackground pb-7 mx-auto">
 
-      <!-- ÜST YATAY KATEGORİ ŞERİDİ (dinamik, sticky/compact) -->
+      <!-- ÜST YATAY KATEGORİ ŞERİDİ (dinamik, fixed two-state) -->
       <div id="catArea" class="catbar">
         <div class="container mx-auto mb-3 px-3">
           <div dir="ltr" class="relative w-full whitespace-nowrap mb-0 overflow-hidden scroll-area"
@@ -117,6 +99,9 @@
           </div>
         </div>
       </div>
+
+      <!-- Fixed bar spacer -->
+      <div id="catSpacer" style="height:0;"></div>
 
       <!-- TÜM KATEGORİ+ÜRÜNLER (dinamik) -->
       <div class="menu-items px-3" id="menuRoot"><!-- JS dolduracak --></div>
@@ -354,14 +339,22 @@
       }
     }
 
-    // Sticky bar compact + Back to top visibility
+    // Fixed bar spacer + two-state toggle
+    function resizeSpacer(){
+      const catArea = document.getElementById('catArea');
+      const spacer = document.getElementById('catSpacer');
+      if (!catArea || !spacer) return;
+      const h = catArea.getBoundingClientRect().height;
+      spacer.style.height = h + 'px';
+    }
     function handleScrollUI(){
       const y = window.scrollY || document.documentElement.scrollTop || 0;
       const catArea = document.getElementById('catArea');
       const btnTop = document.getElementById('btnTop');
-      const compactOn = y > 0; // strictly: top vs not-top
+      const compactOn = y > 0; // üstte değilse küçük mod
       catArea.classList.toggle('compact', compactOn);
       btnTop.classList.toggle('show', y > 250);
+      resizeSpacer();
     }
 
     // ---- BOOT ----
@@ -380,9 +373,10 @@
       await fillProductsFor(categories);
       attachActiveObserver(categories);
 
-      // Scroll davranışları
+      // Scroll & resize davranışları
       handleScrollUI();
       window.addEventListener('scroll', handleScrollUI, { passive: true });
+      window.addEventListener('resize', ()=>{ resizeSpacer(); }, { passive: true });
 
       // Back to top
       document.getElementById('btnTop').addEventListener('click', ()=> {
