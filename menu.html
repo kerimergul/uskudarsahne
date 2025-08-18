@@ -33,20 +33,27 @@
     .cat-tab[data-active="true"] { color: var(--qrblue, #2563eb); font-weight: 600; }
     .cat-tab[data-active="false"] { color: #000; font-weight: 300; }
 
+    
     /* ====== Sticky Kategori Bar ====== */
     .catbar {
       position: sticky; top: 0; z-index: 1000;
       background: rgba(255,255,255,0.85);
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
-      transition: padding .2s ease, box-shadow .2s ease;
+      transition: padding .2s ease, box-shadow .2s ease, background .2s ease;
+      padding: 4px 0;
     }
-    .catbar.compact { box-shadow: 0 2px 10px rgba(0,0,0,.06); }
-    .catbar .thumbWrap { height: 84px; }
-    .catbar.compact .thumbWrap { display: none; }
-    .catbar .tabText { padding: 6px 8px; }
-    .catbar.compact .tabText { padding: 8px 10px; }
+    .catbar.compact { box-shadow: 0 2px 10px rgba(0,0,0,.06); padding: 2px 0; min-height: 38px; }
+    .catbar .thumbWrap { height: 84px; overflow: hidden; transition: height .22s ease, padding .22s ease; }
+    .catbar.compact .thumbWrap { height: 0; padding-top: 0; }
+    .catbar .tabText { padding: 6px 8px; transition: padding .2s ease, background .2s ease; }
+    .catbar.compact .tabText { padding: 6px 10px; background: transparent; }
     .catbar.compact .cat-tab { font-size: 12px; }
+
+    /* Her item genişliği: normalde 109px, compact'ta metne göre (auto) */
+    #categoryBar > div { width: 109px; }
+    .catbar.compact #categoryBar > div { width: auto !important; }
+
 
     /* ====== Lazy image (placeholder) ====== */
     .lazy-img {
