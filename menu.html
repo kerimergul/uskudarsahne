@@ -289,16 +289,22 @@
     }
 
     // --- Scroll & Active Tab ---
+    
     function scrollToCategory(slug){
       const sec = document.getElementById(`category-${slug}`);
       if (!sec) return;
-      sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      const catArea = document.getElementById('catArea');
+      const h = catArea ? catArea.getBoundingClientRect().height : 0;
+      const extra = 10; // başlık biraz boşlukla görünsün
+      const y = window.scrollY + sec.getBoundingClientRect().top - (h + extra);
+      window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
       const tab = [...document.querySelectorAll('#categoryBar > div')].find(d => d.dataset.slug === slug);
       if (tab) tab.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
       const params = new URLSearchParams(location.search);
       params.set('category', slug);
       history.replaceState(null, '', `${location.pathname}?${params.toString()}`);
     }
+
 
     function setActiveSlug(slug){
       document.querySelectorAll('.cat-tab').forEach(el => el.setAttribute('data-active','false'));
