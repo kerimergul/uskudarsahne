@@ -157,18 +157,19 @@
         el.className = 'w-[109px] border-hidden cursor-pointer';
         el.setAttribute('role','link');
         el.dataset.slug = slug;
-        el.innerHTML = `
+        el.innerHTML = \`
           <div class="thumbWrap h-[84px] pt-1 line-clamp-1">
-            <img alt="${escAttr(c.name)}" width="1920" height="1080" decoding="async"
+            <img alt="\${escAttr(c.name)}" width="1920" height="1080" decoding="async"
                  class="w-full h-full object-cover rounded-t-sm lazy-img"
-                 src="${PLACEHOLDER_URL}" data-src="${real}" style="color:transparent;" loading="lazy">
+                 src="\${PLACEHOLDER_URL}" data-src="\${real}" style="color:transparent;" loading="lazy">
           </div>
           <div class="tabText p-1.5 bg-black/10 rounded-b-sm">
             <h3 class="text-[11px] leading-tight tracking-tight text-center line-clamp-1">
-              <span class="cat-tab" data-active="false">${c.name||''}</span>
+              <span class="cat-tab" data-active="false">\${c.name||''}</span>
             </h3>
-          </div>`;
+          </div>\`;
         el.addEventListener('click', ()=>{
+          setActiveSlug(slug); // seçilene göre hemen aktif yap
           ensureProductsLoaded(slug, c._id).then(()=> scrollToCategory(slug));
         });
         bar.appendChild(el);
@@ -181,51 +182,51 @@
       const name = p.name || '';
       const desc = p.description || '';
       const priceText = formatTRY(p.price);
-      return `
+      return \`
       <div>
         <div class="relative">
           <div class="bg-qrborder/0 border-none rounded-sm cursor-pointer">
             <div class="p-0 flex">
               <div class="w-[50%] aspect-[4/3] flex-shrink-0 relative">
-                <img alt="${escAttr(name)}" width="1600" height="1200" decoding="async"
+                <img alt="\${escAttr(name)}" width="1600" height="1200" decoding="async"
                      class="w-full h-full object-cover rounded-sm lazy-img"
-                     src="${PLACEHOLDER_URL}" data-src="${real}" style="color:transparent;" loading="lazy">
+                     src="\${PLACEHOLDER_URL}" data-src="\${real}" style="color:transparent;" loading="lazy">
               </div>
               <div class="w-[50%] flex flex-col justify-between py-1.5 pl-2.5">
                 <div>
                   <div class="flex items-start space-x-2">
-                    <h3 class="text-sm font-normal line-clamp-1">${name}</h3>
+                    <h3 class="text-sm font-normal line-clamp-1">\${name}</h3>
                   </div>
-                  <p class="text-[11px] mt-1 text-gray-700 line-clamp-4 font-light">${escAttr(desc)}</p>
+                  <p class="text-[11px] mt-1 text-gray-700 line-clamp-4 font-light">\${escAttr(desc)}</p>
                 </div>
                 <div class="flex items-center space-x-2">
-                  <span class="font-light text-[13px] whitespace-nowrap">${priceText}</span>
+                  <span class="font-light text-[13px] whitespace-nowrap">\${priceText}</span>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>`;
+      </div>\`;
     }
 
     function categorySectionHTML(cat){
       const slug = slugifyTR(cat.name||'');
-      return `
-      <section id="category-${slug}" class="cat-section">
+      return \`
+      <section id="category-\${slug}" class="cat-section">
         <div class="flex flex-col items-center mb-3 mt-3">
           <div class="bg-qrborder2 p-2 rounded-sm flex w-full items-center justify-center">
             <p class="text-[14px] font-light tracking-wider text-center overflow-hidden text-ellipsis">
-              ${cat.name||''}
+              \${cat.name||''}
             </p>
           </div>
         </div>
-        <div class="grid gap-2.5 grid-cols-1" id="grid-${slug}">
+        <div class="grid gap-2.5 grid-cols-1" id="grid-\${slug}">
           <!-- skeleton -->
           <div class="skeleton h-24 rounded-sm"></div>
           <div class="skeleton h-24 rounded-sm"></div>
           <div class="skeleton h-24 rounded-sm"></div>
         </div>
-      </section>`;
+      </section>\`;
     }
 
     function renderAllSections(categories){
@@ -238,12 +239,12 @@
     const loadedSlugs = new Set();
     async function ensureProductsLoaded(slug, categoryId){
       if (loadedSlugs.has(slug)) return;
-      const grid = document.getElementById(`grid-${slug}`);
+      const grid = document.getElementById(\`grid-\${slug}\`);
       if (!grid) return;
       // ürünleri çek
-      const list = await fetchJSON(`${API_BASE}/api/products?categoryId=${encodeURIComponent(categoryId)}&limit=500`);
+      const list = await fetchJSON(\`\${API_BASE}/api/products?categoryId=\${encodeURIComponent(categoryId)}&limit=500\`);
       if (!Array.isArray(list) || list.length===0){
-        grid.innerHTML = `<div class="text-center text-xs opacity-70 py-4">Bu kategoride ürün yok.</div>`;
+        grid.innerHTML = \`<div class="text-center text-xs opacity-70 py-4">Bu kategoride ürün yok.</div>\`;
       }else{
         // DOM insert tek seferde
         const html = list.map(productCardHTML).join('');
@@ -259,19 +260,19 @@
         for(const e of entries){
           if(!e.isIntersecting) continue;
           const slug = e.target.id.replace(/^category-/,'');
-          const id = idBySlug.get(slug);
+        const id = idBySlug.get(slug);
           if (id) ensureProductsLoaded(slug, id);
         }
       }, { root:null, rootMargin:'200px 0px', threshold:0.01 });
       categories.forEach(c=>{
-        const sec = document.getElementById(`category-${slugifyTR(c.name||'')}`);
+        const sec = document.getElementById(\`category-\${slugifyTR(c.name||'')}\`);
         if (sec) io.observe(sec);
       });
     }
 
     /* ====== Scroll & Active Tab ====== */
     function scrollToCategory(slug){
-      const sec = document.getElementById(`category-${slug}`);
+      const sec = document.getElementById(\`category-\${slug}\`);
       if (!sec) return;
       const catArea = document.getElementById('catArea');
       const h = catArea ? catArea.getBoundingClientRect().height : 0;
@@ -284,44 +285,38 @@
 
       const params = new URLSearchParams(location.search);
       params.set('category', slug);
-      history.replaceState(null,'', `${location.pathname}?${params.toString()}`);
+      history.replaceState(null,'', \`\${location.pathname}?\${params.toString()}\`);
     }
 
     function setActiveSlug(slug){
       document.querySelectorAll('.cat-tab').forEach(el=> el.setAttribute('data-active','false'));
-      const active = document.querySelector(`#categoryBar > div[data-slug="${slug}"] .cat-tab`);
+      const active = document.querySelector(\`#categoryBar > div[data-slug="\${slug}"] .cat-tab\`);
       if (active) active.setAttribute('data-active','true');
     }
 
-    function attachActiveObserver(categories){
-      const mapSlugToEl = new Map();
-      categories.forEach(c=>{
-        const slug = slugifyTR(c.name||'');
-        const sec = document.getElementById(`category-${slug}`);
-        if (sec) mapSlugToEl.set(slug, sec);
-      });
+    // --- Yeni: En üstte görünen bölüme göre aktif sekmeyi belirle ---
+    function updateActiveByTop(){
+      const catArea = document.getElementById('catArea');
+      const y = (catArea ? catArea.getBoundingClientRect().bottom : 0) + 1; // sabit barın altı
+      const sections = Array.from(document.querySelectorAll('.cat-section'));
+      if (!sections.length) return;
 
-      let current = null;
-      const obs = new IntersectionObserver((entries)=>{
-        const visible = entries.filter(e=> e.isIntersecting)
-          .sort((a,b)=> a.boundingClientRect.top - b.boundingClientRect.top);
-        if (visible.length){
-          const slug = visible[0].target.id.replace(/^category-/,'');
-          if (slug !== current){ current = slug; setActiveSlug(slug); }
-        }
-      }, { root:null, threshold:0.5 });
+      let chosen = null;
+      let firstAfter = null;
+      let lastBefore = null;
 
-      for (const [,sec] of mapSlugToEl) obs.observe(sec);
-
-      const initial = new URLSearchParams(location.search).get('category');
-      if (initial && mapSlugToEl.has(initial)) {
-        // İlk hedef kategori: önce ürünleri yükle, ardından kaydır
-        ensureProductsLoaded(initial, categories.find(c=>slugifyTR(c.name||'')===initial)._id)
-          .then(()=> setTimeout(()=> scrollToCategory(initial), 50));
-      } else if (categories.length){
-        const first = slugifyTR(categories[0].name||'');
-        setActiveSlug(first);
+      for (const sec of sections){
+        const r = sec.getBoundingClientRect();
+        // Bar çizgisi bu bölümün içinde mi?
+        if (r.top <= y && r.bottom > y) { chosen = sec; break; }
+        if (r.top > y && !firstAfter) firstAfter = sec;
+        if (r.top <= y) lastBefore = sec;
       }
+      if (!chosen) chosen = firstAfter || lastBefore || sections[0];
+      if (!chosen) return;
+
+      const slug = chosen.id.replace(/^category-/,''); 
+      setActiveSlug(slug);
     }
 
     // Fixed bar spacer + two-state toggle
@@ -339,14 +334,28 @@
       catArea.classList.toggle('compact', compactOn);
       btnTop.classList.toggle('show', y > 250);
       resizeSpacer();
+      updateActiveByTop(); // --- aktif sekmeyi en üstteki bölüme göre ayarla
+    }
+
+    // --- Başlangıç: sadece ilk aktifliği ayarla (IO ile değil) ---
+    function initActiveState(categories){
+      const initial = new URLSearchParams(location.search).get('category');
+      if (initial) {
+        setActiveSlug(initial);
+        const found = categories.find(c=> slugifyTR(c.name||'') === initial);
+        if (found) ensureProductsLoaded(initial, found._id).then(()=> setTimeout(()=> scrollToCategory(initial), 50));
+      } else if (categories.length){
+        const first = slugifyTR(categories[0].name||'');
+        setActiveSlug(first);
+      }
     }
 
     /* ====== BOOT ====== */
     document.addEventListener('DOMContentLoaded', async ()=>{
-      const categories = await fetchJSON(`${API_BASE}/api/categories`);
+      const categories = await fetchJSON(\`${API_BASE}/api/categories\`);
       if (!Array.isArray(categories) || categories.length===0){
         document.getElementById('menuRoot').innerHTML =
-          `<div class="text-center text-xs opacity-70 py-6">Kategori bulunamadı.</div>`;
+          \`<div class="text-center text-xs opacity-70 py-6">Kategori bulunamadı.</div>\`;
         return;
       }
 
@@ -357,15 +366,21 @@
       // 2) Gözükmeye başlayınca ürünler yüklensin
       attachSectionLoader(categories);
 
-      // 3) Aktif sekme takibi
-      attachActiveObserver(categories);
+      // 3) Aktif sekme başlangıcı
+      initActiveState(categories);
 
       // 4) UI davranışları
       handleScrollUI();
       window.addEventListener('scroll', handleScrollUI, { passive:true });
       window.addEventListener('resize', ()=> resizeSpacer(), { passive:true });
 
-      // 5) İlk ekranda görünen 1-2 bölümü önceden ısıt (hızlı LCP)
+      // 5) Back to top: çalışsın
+      const btn = document.getElementById('btnTop');
+      if (btn){
+        btn.addEventListener('click', ()=> window.scrollTo({ top: 0, behavior: 'smooth' }));
+      }
+
+      // 6) İlk ekranda görünen 1-2 bölümü önceden ısıt (hızlı LCP)
       const first = slugifyTR(categories[0].name||'');
       ensureProductsLoaded(first, categories[0]._id);
       if (categories[1]) {
