@@ -109,14 +109,30 @@
     const FALLBACK_IMG = "https://qrmenu-cdn.b-cdn.net/assets/header.jpg";
 
     // Türkçe slug
+    
+    // Türkçe ve genel aksan kaldırma ile güvenli slug
     function slugifyTR(str=''){
-      const map = { 'Ç':'C','Ö':'O','Ş':'S','İ':'I','I':'I','Ü':'U','Ğ':'G',
-                    'ç':'c','ö':'o','ş':'s','ı':'i','i':'i','ü':'u','ğ':'g' };
+      return String(str)
+        .normalize('NFD')                       // birleşik harfleri ayrıştır
+        .replace(/[u0300-u036f]/g,'')         // aksan işaretlerini at
+        // Türkçe özel harf dönüşümleri
+        .replace(/ğ/g,'g').replace(/Ğ/g,'G')
+        .replace(/ü/g,'u').replace(/Ü/g,'U')
+        .replace(/ş/g,'s').replace(/Ş/g,'S')
+        .replace(/ı/g,'i').replace(/İ/g,'I')
+        .replace(/ö/g,'o').replace(/Ö/g,'O')
+        .replace(/ç/g,'c').replace(/Ç/g,'C')
+        .toLowerCase()
+        .replace(/[^a-z0-9s-]/g,'')            // ascii dışı temizle
+        .trim().replace(/s+/g,'-')             // boşlukları tire yap
+        .replace(/-+/g,'-');                    // fazla tireleri tekle
+    };
+
       return String(str).split('').map(ch => map[ch] || ch)
         .join('').toLowerCase()
         .replace(/[^a-z0-9s-]/g,'')
         .trim().replace(/s+/g,'-').replace(/-+/g,'-');
-    }
+    
     const escAttr = s => String(s).replace(/"/g,'&quot;');
 
     async function fetchJSON(url){
