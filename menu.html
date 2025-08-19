@@ -46,7 +46,7 @@
     #categoryBar>div{ width:109px; }
     .catbar.compact #categoryBar>div{ width:auto!important; }
 
-    /* Lazy image (hafif; blur kaldırıldı → daha az paint maliyeti) */
+    /* Lazy image */
     .lazy-img{ background:#eee; opacity:.95; transition:opacity .25s ease; }
     .lazy-img.loaded{ opacity:1; }
 
@@ -169,7 +169,7 @@
             </h3>
           </div>`;
         el.addEventListener('click', ()=>{
-          setActiveSlug(slug); // seçilene göre hemen aktif yap
+          setActiveSlug(slug); // seçileni hemen aktif boya
           ensureProductsLoaded(slug, c._id).then(()=> scrollToCategory(slug));
         });
         bar.appendChild(el);
@@ -214,7 +214,7 @@
       return `
       <section id="category-${slug}" class="cat-section">
         <div class="flex flex-col items-center mb-3 mt-3">
-          <div class="bg-qrborder2 p-2 rounded-sm flex w-full items-center justify-center">
+          <div class="bg-qrborder2 p-2 rounded-sm flex w-full items-center justify-center cat-heading">
             <p class="text-[14px] font-light tracking-wider text-center overflow-hidden text-ellipsis">
               ${cat.name||''}
             </p>
@@ -260,7 +260,7 @@
         for(const e of entries){
           if(!e.isIntersecting) continue;
           const slug = e.target.id.replace(/^category-/,'');
-        const id = idBySlug.get(slug);
+          const id = idBySlug.get(slug);
           if (id) ensureProductsLoaded(slug, id);
         }
       }, { root:null, rootMargin:'200px 0px', threshold:0.01 });
@@ -271,51 +271,69 @@
     }
 
     /* ====== Scroll & Active Tab ====== */
+    let __currentActiveSlug = null;
+    let __lastTabScrollSlug = null;
+
+    function ensureActiveTabVisible(slug){
+      if (__lastTabScrollSlug === slug) return;
+      const tab = document.querySelector(`#categoryBar > div[data-slug="${slug}"]`);
+      if (tab){
+        __lastTabScrollSlug = slug;
+        tab.scrollIntoView({ behavior:'smooth', inline:'center', block:'nearest' });
+      }
+    }
+
+    function setActiveSlug(slug){
+      if (__currentActiveSlug === slug) return;
+      __currentActiveSlug = slug;
+      document.querySelectorAll('.cat-tab').forEach(el=> el.setAttribute('data-active','false'));
+      const active = document.querySelector(`#categoryBar > div[data-slug="${slug}"] .cat-tab`);
+      if (active) active.setAttribute('data-active','true');
+      ensureActiveTabVisible(slug);
+    }
+
+    function getTopLineY(){
+      const catArea = document.getElementById('catArea');
+      // Sticky bar'ın alt çizgisi (cihazdan bağımsız)
+      return (catArea ? catArea.getBoundingClientRect().bottom : 0) + 1;
+    }
+
+    // En üstteki görünen bölümün başlığına göre aktif sekme
+    function updateActiveByTop(){
+      const topLine = getTopLineY();
+      const sections = Array.from(document.querySelectorAll('.cat-section'));
+      if (!sections.length) return;
+
+      // Her bölüm için BAŞLIK elemanının (cat-heading) top'ını ölç
+      let candidateSlug = null;
+      let bestTopLE = -Infinity;   // top <= topLine olanlar içinde en büyük top
+      let firstAfterSlug = null;   // hiçbiri uymuyorsa, topLine'dan sonraki ilk bölüm
+
+      for (const sec of sections){
+        const heading = sec.querySelector('.cat-heading') || sec;
+        const top = heading.getBoundingClientRect().top;
+        const slug = sec.id.replace(/^category-/, '');
+
+        if (top <= topLine){
+          if (top > bestTopLE){ bestTopLE = top; candidateSlug = slug; }
+        } else if (!firstAfterSlug){
+          firstAfterSlug = slug;
+        }
+      }
+      const chosen = candidateSlug || firstAfterSlug || sections[0].id.replace(/^category-/,'');
+      if (chosen) setActiveSlug(chosen);
+    }
+
     function scrollToCategory(slug){
       const sec = document.getElementById(`category-${slug}`);
       if (!sec) return;
       const catArea = document.getElementById('catArea');
+      const anchor = sec.querySelector('.cat-heading') || sec;
       const h = catArea ? catArea.getBoundingClientRect().height : 0;
-      const extra = 10;
-      const y = window.scrollY + sec.getBoundingClientRect().top - (h + extra);
+      const margin = 6; // küçük nefes payı
+      const y = window.scrollY + anchor.getBoundingClientRect().top - (h + margin);
       window.scrollTo({ top: Math.max(0,y), behavior:'smooth' });
 
-      const tab = [...document.querySelectorAll('#categoryBar > div')].find(d=> d.dataset.slug===slug);
-      if (tab) tab.scrollIntoView({ behavior:'smooth', inline:'center', block:'nearest' });
-
-      const params = new URLSearchParams(location.search);
-      params.set('category', slug);
-      history.replaceState(null,'', `${location.pathname}?${params.toString()}`);
-    }
-
-    function setActiveSlug(slug){
-      document.querySelectorAll('.cat-tab').forEach(el=> el.setAttribute('data-active','false'));
-      const active = document.querySelector(`#categoryBar > div[data-slug="${slug}"] .cat-tab`);
-      if (active) active.setAttribute('data-active','true');
-    }
-
-    // --- Yeni: En üstte görünen bölüme göre aktif sekmeyi belirle ---
-    function updateActiveByTop(){
-      const catArea = document.getElementById('catArea');
-      const y = (catArea ? catArea.getBoundingClientRect().bottom : 0) + 1; // sabit barın altı
-      const sections = Array.from(document.querySelectorAll('.cat-section'));
-      if (!sections.length) return;
-
-      let chosen = null;
-      let firstAfter = null;
-      let lastBefore = null;
-
-      for (const sec of sections){
-        const r = sec.getBoundingClientRect();
-        // Bar çizgisi bu bölümün içinde mi?
-        if (r.top <= y && r.bottom > y) { chosen = sec; break; }
-        if (r.top > y && !firstAfter) firstAfter = sec;
-        if (r.top <= y) lastBefore = sec;
-      }
-      if (!chosen) chosen = firstAfter || lastBefore || sections[0];
-      if (!chosen) return;
-
-      const slug = chosen.id.replace(/^category-/,''); 
       setActiveSlug(slug);
     }
 
@@ -334,10 +352,10 @@
       catArea.classList.toggle('compact', compactOn);
       btnTop.classList.toggle('show', y > 250);
       resizeSpacer();
-      updateActiveByTop(); // --- aktif sekmeyi en üstteki bölüme göre ayarla
+      updateActiveByTop();
     }
 
-    // --- Başlangıç: sadece ilk aktifliği ayarla (IO ile değil) ---
+    // Başlangıç: URL kategorisi varsa önce onu hizala
     function initActiveState(categories){
       const initial = new URLSearchParams(location.search).get('category');
       if (initial) {
@@ -372,7 +390,7 @@
       // 4) UI davranışları
       handleScrollUI();
       window.addEventListener('scroll', handleScrollUI, { passive:true });
-      window.addEventListener('resize', ()=> resizeSpacer(), { passive:true });
+      window.addEventListener('resize', ()=> { resizeSpacer(); updateActiveByTop(); }, { passive:true });
 
       // 5) Back to top: çalışsın
       const btn = document.getElementById('btnTop');
