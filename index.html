@@ -20,13 +20,11 @@
   <style>
     .is-hidden{ display:none !important; }
 
-    /* Slider için güvenli varsayılanlar */
+    /* Slider */
     .auto-slider{ position:relative; overflow:hidden; user-select:none; }
     .auto-slider .track{
-      display:flex;
-      transition: transform .45s ease;
-      will-change: transform;
-      touch-action: pan-y; /* dikey kaydırmaya izin ver, yatay bizde */
+      display:flex; transition: transform .45s ease; will-change: transform;
+      touch-action: pan-y; /* dikey kaydırmaya izin ver */
     }
     .auto-slider.dragging .track{ transition:none; cursor:grabbing; }
     .auto-slider .slide{ flex: 0 0 100%; }
@@ -35,7 +33,7 @@
     .auto-slider .nav{
       position:absolute; top:50%; transform:translateY(-50%);
       background:rgba(0,0,0,.45); color:#fff; border:0; width:36px; height:36px;
-      border-radius:999px; cursor:pointer; z-index:20; /* BUTONLAR ÜSTE */
+      border-radius:999px; cursor:pointer; z-index:20;
       display:flex; align-items:center; justify-content:center;
     }
     .auto-slider .nav.prev{ left:8px; }
@@ -57,14 +55,14 @@
         </div>
       </div>
 
-      <!-- FILTER BAR -->
+      <!-- FILTER BAR (tasarım korunur) -->
       <div class="mb-3 mt-1 px-3" style="margin-top:1rem">
         <div class="flex items-center justify-between w-full pt-1">
           <div class="flex items-center space-x-2 w-full">
             <div class="flex space-x-2 overflow-x-auto flex-1">
-              <button class="filter-btn ... " data-filter="all">Tümü</button>
-              <button class="filter-btn ... " data-filter="food">Yemek</button>
-              <button class="filter-btn ... " data-filter="drink">İçecek</button>
+              <button class="filter-btn inline-flex items-center justify-center whitespace-nowrap rounded-md transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 active:text-opacity-50 bg-qrbackground !rounded-sm border border-qrborder2 px-4 py-2 capitalize font-normal text-[12px] h-8 w-[72px]" data-filter="all">Tümü</button>
+              <button class="filter-btn inline-flex items-center justify-center whitespace-nowrap rounded-md transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 active:text-opacity-50 bg-qrbackground !rounded-sm border border-qrborder2 px-4 py-2 capitalize font-normal text-[12px] h-8 w-[72px]" data-filter="food">Yemek</button>
+              <button class="filter-btn inline-flex items-center justify-center whitespace-nowrap rounded-md transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 active:text-opacity-50 bg-qrbackground !rounded-sm border border-qrborder2 px-4 py-2 capitalize font-normal text-[12px] h-8 w-[72px]" data-filter="drink">İçecek</button>
             </div>
           </div>
         </div>
@@ -75,7 +73,7 @@
         <div id="menuGrid" class="grid gap-3 grid-cols-2"></div>
       </div>
 
-      <!-- EVENTS SLIDER -->
+      <!-- EVENTS SLIDER (manual only, infinite loop) -->
       <section id="eventsSection" class="px-3 mt-10 justify-center items-center is-hidden" aria-labelledby="events-title">
         <h2 id="events-title" class="text-sm font-semibold text-center">Gelecek Etkinlikler</h2>
         <div class="auto-slider" id="eventsSlider" tabindex="0" aria-label="Etkinlik görsel slider">
@@ -96,7 +94,7 @@
             <a href="https://www.facebook.com/people/Üsküdar-Sahne/61571611235950" target="_blank" rel="noopener" aria-label="Facebook" title="Facebook">
               <img src="https://qrmenu-cdn.b-cdn.net/assets/facebook.png" alt="Facebook"/>
             </a>
-            <a href="https://www.google.com/maps/place/ÜSKÜDAR+SAHNE/..." target="_blank" rel="noopener" aria-label="Google Maps" title="Google Maps">
+            <a href="https://www.google.com/maps/place/ÜSKÜDAR+SAHNE/@41.0251341,29.0139226,919m/data=!3m1!1e3!4m6!3m5!1s0x14cab739fbd2417d:0xe334930169f75ef2!8m2!3d41.0251341!4d29.0139226!16s%2Fg%2F11wv9tk232?entry=ttu" target="_blank" rel="noopener" aria-label="Google Maps" title="Google Maps">
               <img src="https://icons.iconarchive.com/icons/dtafalonso/android-lollipop/32/Maps-icon.png" alt="Google Maps" width="30" height="30">
             </a>
           </div>
@@ -124,7 +122,7 @@
     async function fetchJSON(url){
       try{
         const res = await fetch(url, { credentials: 'omit', cache: 'no-store' });
-        if(!res.ok) throw new Error(`${res.status}`);
+        if(!res.ok) throw new Error(\`\${res.status}\`);
         return await res.json();
       }catch(e){
         console.error("[API ERROR]", url, e);
@@ -137,7 +135,7 @@
       const grid = document.getElementById('menuGrid');
       grid.innerHTML = '';
       if(!Array.isArray(cats) || cats.length===0){
-        grid.innerHTML = `<div class="col-span-2 text-center text-xs opacity-70 py-6">Kategori bulunamadı.</div>`;
+        grid.innerHTML = \`<div class="col-span-2 text-center text-xs opacity-70 py-6">Kategori bulunamadı.</div>\`;
         return;
       }
       for(const c of cats){
@@ -149,19 +147,19 @@
 
         const a = document.createElement('a');
         a.className = 'block filter-card';
-        a.dataset.cat = kind;
-        a.href = `menu.html?category=${encodeURIComponent(slug)}&categoryId=${encodeURIComponent(id)}`;
-        a.innerHTML = `
+        a.dataset.cat = kind; // menü filtresi için
+        a.href = \`menu.html?category=\${encodeURIComponent(slug)}&categoryId=\${encodeURIComponent(id)}\`;
+        a.innerHTML = \`
           <div class="overflow-hidden rounded-sm">
             <div class="w-full aspect-[16/8]">
-              <img src="${img}" alt="${escAttr(name)}" class="w-full h-full object-cover" loading="lazy" decoding="async">
+              <img src="\${img}" alt="\${escAttr(name)}" class="w-full h-full object-cover" loading="lazy" decoding="async">
             </div>
             <div class="p-1.5 bg-black/10 dark:bg-black/30">
               <h2 class="text-[11px] leading-tight tracking-tight text-center dark:font-light line-clamp-1 font-normal">
-                ${name}
+                \${name}
               </h2>
             </div>
-          </div>`;
+          </div>\`;
         grid.appendChild(a);
       }
     }
@@ -183,20 +181,20 @@
     }
 
     async function loadCategories(){
-      const data = await fetchJSON(`${API_BASE}/api/categories`);
+      const data = await fetchJSON(\`\${API_BASE}/api/categories\`);
       if(data) { renderCategories(data); wireCategoryFilter(); }
     }
 
     // ---- ETKİNLİKLER (slider) ----
-    let sliderTimer = null;
-    function destroyAutoSlider(){
-      if(sliderTimer){ clearInterval(sliderTimer); sliderTimer = null; }
-      const track = document.getElementById('autoTrack');
-      if (track) track.style.transform = 'translateX(0)';
+    function destroySliderDrag(){
+      const container = document.getElementById('eventsSlider');
+      if(!container) return;
+      container.onpointerdown = container.onpointermove = container.onpointerup = null;
+      container.ontouchstart = container.ontouchmove = container.ontouchend = null;
     }
 
-    function initAutoSlider(){
-      destroyAutoSlider();
+    function initManualSlider(){
+      destroySliderDrag();
       const container = document.getElementById('eventsSlider');
       const track = document.getElementById('autoTrack');
       const prevBtn = container.querySelector('.nav.prev');
@@ -205,53 +203,51 @@
       const slides = track.children.length;
       if(!slides) return;
 
+      // 1 slayt varsa butonları gizle
+      if (slides < 2){
+        prevBtn.style.display = 'none';
+        nextBtn.style.display = 'none';
+      } else {
+        prevBtn.style.display = '';
+        nextBtn.style.display = '';
+      }
+
       let index = 0;
       const go = (i)=>{
-        index = (i + slides) % slides;
-        track.style.transform = `translateX(${-index * 100}%)`;
-      };
-      const start = ()=>{
-        destroyAutoSlider();
-        sliderTimer = setInterval(()=> go(index + 1), 3500);
+        index = (i % slides + slides) % slides; // sonsuz döngü
+        track.style.transform = \`translateX(\${-index * 100}%)\`;
       };
 
-      // --- BUTONLAR (manuel kontrol) ---
-      prevBtn.onclick = (e)=>{ e.preventDefault(); e.stopPropagation(); go(index - 1); start(); };
-      nextBtn.onclick = (e)=>{ e.preventDefault(); e.stopPropagation(); go(index + 1); start(); };
+      // --- BUTONLAR ---
+      prevBtn.onclick = (e)=>{ e.preventDefault(); e.stopPropagation(); go(index - 1); };
+      nextBtn.onclick = (e)=>{ e.preventDefault(); e.stopPropagation(); go(index + 1); };
 
-      // --- KLAVYE (sol/sağ ok) ---
+      // --- KLAVYE ---
       container.addEventListener('keydown', (e)=>{
-        if(e.key === 'ArrowLeft'){ go(index - 1); start(); }
-        if(e.key === 'ArrowRight'){ go(index + 1); start(); }
+        if(e.key === 'ArrowLeft'){ go(index - 1); }
+        if(e.key === 'ArrowRight'){ go(index + 1); }
       });
 
-      // --- SÜRÜKLEME / SWIPE (mouse + touch + pen) ---
+      // --- SÜRÜKLEME / SWIPE (manual only) ---
       let isDown = false, startX = 0, deltaX = 0;
 
       const getX = (ev) => ('touches' in ev) ? ev.touches[0].clientX : ev.clientX;
-      const thresholdPx = ()=> Math.max(40, container.clientWidth * 0.18); // %18 veya min 40px
+      const thresholdPx = ()=> Math.max(40, container.clientWidth * 0.18);
 
       const onDown = (ev)=>{
-        // butona basıldıysa sürükleme başlatma
-        if (ev.target.closest('.nav')) return;
-        isDown = true;
-        startX = getX(ev);
-        deltaX = 0;
+        if (ev.target.closest('.nav')) return; // nav'a tıklama sürükleme başlatmasın
+        isDown = true; startX = getX(ev); deltaX = 0;
         container.classList.add('dragging');
-        destroyAutoSlider();
-        // pointer event ise capture al
         if (ev.pointerId && container.setPointerCapture) {
           try { container.setPointerCapture(ev.pointerId); } catch {}
         }
       };
-
       const onMove = (ev)=>{
         if(!isDown) return;
         deltaX = getX(ev) - startX;
         const pct = (deltaX / container.clientWidth) * 100;
-        track.style.transform = `translateX(${(-index * 100) + pct}%)`;
+        track.style.transform = \`translateX(\${(-index * 100) + pct}%)\`;
       };
-
       const onUp = ()=>{
         if(!isDown) return;
         container.classList.remove('dragging');
@@ -259,32 +255,24 @@
         if (Math.abs(deltaX) > th) {
           go(index + (deltaX < 0 ? 1 : -1));
         } else {
-          go(index); // geri yerine oturt
+          go(index);
         }
-        start();
-        isDown = false;
-        deltaX = 0;
+        isDown = false; deltaX = 0;
       };
 
-      // Pointer Events (modern tarayıcıların tamamı)
       container.addEventListener('pointerdown', onDown);
       container.addEventListener('pointermove', onMove);
       container.addEventListener('pointerup', onUp);
       container.addEventListener('pointercancel', onUp);
       container.addEventListener('pointerleave', onUp);
 
-      // iOS eski WebView için emniyet kemeri (touch)
+      // iOS emniyet
       container.addEventListener('touchstart', onDown, {passive:true});
       container.addEventListener('touchmove', onMove, {passive:true});
       container.addEventListener('touchend', onUp);
 
-      // Hover’da dur, ayrılınca devam et
-      container.addEventListener('mouseenter', ()=> destroyAutoSlider());
-      container.addEventListener('mouseleave', ()=> start());
-      window.addEventListener('visibilitychange', ()=> document.hidden ? destroyAutoSlider() : start());
-      window.addEventListener('resize', ()=> go(index)); // yeniden boyutta konum tazele
-
-      go(0); start();
+      // İlk konum
+      go(0);
     }
 
     function renderEventsSlider(events){
@@ -293,7 +281,6 @@
 
       if(!Array.isArray(events) || events.length === 0){
         section.classList.add('is-hidden');
-        destroyAutoSlider();
         track.innerHTML = '';
         return;
       }
@@ -304,17 +291,16 @@
       for(const ev of events){
         const name = ev.name || 'Etkinlik';
         const when = ev.eventDate ? new Date(ev.eventDate) : null;
-        const alt = when ? `${name} – ${when.toLocaleString('tr-TR')}` : name;
+        const alt = when ? \`\${name} – \${when.toLocaleString('tr-TR')}\` : name;
         const img = (ev.images && (ev.images.w1024 || ev.images.w640)) || ev.imageUrl || FALLBACK_IMG;
 
         const slide = document.createElement('div');
         slide.className = 'slide';
-        slide.innerHTML = `<img src="${img}" alt="${escAttr(alt)}" loading="lazy" decoding="async">`;
+        slide.innerHTML = \`<img src="\${img}" alt="\${escAttr(alt)}" loading="lazy" decoding="async">\`;
         track.appendChild(slide);
       }
 
-      // DOM güncellendikten sonra slider’ı kur
-      requestAnimationFrame(()=> initAutoSlider());
+      requestAnimationFrame(()=> initManualSlider());
     }
 
     function startOfTodayISO(){
@@ -325,7 +311,7 @@
 
     async function loadUpcomingEvents(){
       const fromISO = startOfTodayISO();
-      const url = `${API_BASE}/api/events/upcoming?from=${encodeURIComponent(fromISO)}&limit=12`;
+      const url = \`\${API_BASE}/api/events/upcoming?from=\${encodeURIComponent(fromISO)}&limit=12\`;
 
       try{
         const res = await fetch(url, { credentials:'omit', cache:'no-store' });
