@@ -114,15 +114,15 @@
                     'ç':'c','ö':'o','ş':'s','ı':'i','i':'i','ü':'u','ğ':'g' };
       return String(str).split('').map(ch => map[ch] || ch)
         .join('').toLowerCase()
-        .replace(/[^a-z0-9\s-]/g,'')
-        .trim().replace(/\s+/g,'-').replace(/-+/g,'-');
+        .replace(/[^a-z0-9s-]/g,'')
+        .trim().replace(/s+/g,'-').replace(/-+/g,'-');
     }
     const escAttr = s => String(s).replace(/"/g,'&quot;');
 
     async function fetchJSON(url){
       try{
         const res = await fetch(url, { credentials: 'omit', cache: 'no-store' });
-        if(!res.ok) throw new Error(\`\${res.status}\`);
+        if(!res.ok) throw new Error(`${res.status}`);
         return await res.json();
       }catch(e){
         console.error("[API ERROR]", url, e);
@@ -135,7 +135,7 @@
       const grid = document.getElementById('menuGrid');
       grid.innerHTML = '';
       if(!Array.isArray(cats) || cats.length===0){
-        grid.innerHTML = \`<div class="col-span-2 text-center text-xs opacity-70 py-6">Kategori bulunamadı.</div>\`;
+        grid.innerHTML = `<div class="col-span-2 text-center text-xs opacity-70 py-6">Kategori bulunamadı.</div>`;
         return;
       }
       for(const c of cats){
@@ -148,18 +148,18 @@
         const a = document.createElement('a');
         a.className = 'block filter-card';
         a.dataset.cat = kind; // menü filtresi için
-        a.href = \`menu.html?category=\${encodeURIComponent(slug)}&categoryId=\${encodeURIComponent(id)}\`;
-        a.innerHTML = \`
+        a.href = `menu.html?category=${encodeURIComponent(slug)}&categoryId=${encodeURIComponent(id)}`;
+        a.innerHTML = `
           <div class="overflow-hidden rounded-sm">
             <div class="w-full aspect-[16/8]">
-              <img src="\${img}" alt="\${escAttr(name)}" class="w-full h-full object-cover" loading="lazy" decoding="async">
+              <img src="${img}" alt="${escAttr(name)}" class="w-full h-full object-cover" loading="lazy" decoding="async">
             </div>
             <div class="p-1.5 bg-black/10 dark:bg-black/30">
               <h2 class="text-[11px] leading-tight tracking-tight text-center dark:font-light line-clamp-1 font-normal">
-                \${name}
+                ${name}
               </h2>
             </div>
-          </div>\`;
+          </div>`;
         grid.appendChild(a);
       }
     }
@@ -181,7 +181,7 @@
     }
 
     async function loadCategories(){
-      const data = await fetchJSON(\`\${API_BASE}/api/categories\`);
+      const data = await fetchJSON(`${API_BASE}/api/categories`);
       if(data) { renderCategories(data); wireCategoryFilter(); }
     }
 
@@ -215,7 +215,7 @@
       let index = 0;
       const go = (i)=>{
         index = (i % slides + slides) % slides; // sonsuz döngü
-        track.style.transform = \`translateX(\${-index * 100}%)\`;
+        track.style.transform = `translateX(${-index * 100}%)`;
       };
 
       // --- BUTONLAR ---
@@ -246,7 +246,7 @@
         if(!isDown) return;
         deltaX = getX(ev) - startX;
         const pct = (deltaX / container.clientWidth) * 100;
-        track.style.transform = \`translateX(\${(-index * 100) + pct}%)\`;
+        track.style.transform = `translateX(${(-index * 100) + pct}%)`;
       };
       const onUp = ()=>{
         if(!isDown) return;
@@ -291,12 +291,12 @@
       for(const ev of events){
         const name = ev.name || 'Etkinlik';
         const when = ev.eventDate ? new Date(ev.eventDate) : null;
-        const alt = when ? \`\${name} – \${when.toLocaleString('tr-TR')}\` : name;
+        const alt = when ? `${name} – ${when.toLocaleString('tr-TR')}` : name;
         const img = (ev.images && (ev.images.w1024 || ev.images.w640)) || ev.imageUrl || FALLBACK_IMG;
 
         const slide = document.createElement('div');
         slide.className = 'slide';
-        slide.innerHTML = \`<img src="\${img}" alt="\${escAttr(alt)}" loading="lazy" decoding="async">\`;
+        slide.innerHTML = `<img src="${img}" alt="${escAttr(alt)}" loading="lazy" decoding="async">`;
         track.appendChild(slide);
       }
 
@@ -311,7 +311,7 @@
 
     async function loadUpcomingEvents(){
       const fromISO = startOfTodayISO();
-      const url = \`\${API_BASE}/api/events/upcoming?from=\${encodeURIComponent(fromISO)}&limit=12\`;
+      const url = `${API_BASE}/api/events/upcoming?from=${encodeURIComponent(fromISO)}&limit=12`;
 
       try{
         const res = await fetch(url, { credentials:'omit', cache:'no-store' });
