@@ -20,15 +20,23 @@
   <style>
     .is-hidden{ display:none !important; }
 
-    /* Slider için güvenli varsayılanlar (harici CSS yoksa devreye girer) */
-    .auto-slider{ position:relative; overflow:hidden; }
-    .auto-slider .track{ display:flex; transition: transform .45s ease; will-change: transform; }
+    /* Slider için güvenli varsayılanlar */
+    .auto-slider{ position:relative; overflow:hidden; user-select:none; }
+    .auto-slider .track{
+      display:flex;
+      transition: transform .45s ease;
+      will-change: transform;
+      touch-action: pan-y; /* dikey kaydırmaya izin ver, yatay bizde */
+    }
+    .auto-slider.dragging .track{ transition:none; cursor:grabbing; }
     .auto-slider .slide{ flex: 0 0 100%; }
     .auto-slider .slide img{ display:block; width:100%; height:400px; object-fit:contain; }
+
     .auto-slider .nav{
       position:absolute; top:50%; transform:translateY(-50%);
       background:rgba(0,0,0,.45); color:#fff; border:0; width:36px; height:36px;
-      border-radius:999px; cursor:pointer;
+      border-radius:999px; cursor:pointer; z-index:20; /* BUTONLAR ÜSTE */
+      display:flex; align-items:center; justify-content:center;
     }
     .auto-slider .nav.prev{ left:8px; }
     .auto-slider .nav.next{ right:8px; }
@@ -54,9 +62,9 @@
         <div class="flex items-center justify-between w-full pt-1">
           <div class="flex items-center space-x-2 w-full">
             <div class="flex space-x-2 overflow-x-auto flex-1">
-              <button class="filter-btn inline-flex items-center justify-center whitespace-nowrap rounded-md transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 active:text-opacity-50 bg-qrbackground !rounded-sm border border-qrborder2 px-4 py-2 capitalize font-normal text-[12px] h-8 w-[72px]" data-filter="all">Tümü</button>
-              <button class="filter-btn inline-flex items-center justify-center whitespace-nowrap rounded-md transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 active:text-opacity-50 bg-qrbackground !rounded-sm border border-qrborder2 px-4 py-2 capitalize font-normal text-[12px] h-8 w-[72px]" data-filter="food">Yemek</button>
-              <button class="filter-btn inline-flex items-center justify-center whitespace-nowrap rounded-md transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 active:text-opacity-50 bg-qrbackground !rounded-sm border border-qrborder2 px-4 py-2 capitalize font-normal text-[12px] h-8 w-[72px]" data-filter="drink">İçecek</button>
+              <button class="filter-btn ... " data-filter="all">Tümü</button>
+              <button class="filter-btn ... " data-filter="food">Yemek</button>
+              <button class="filter-btn ... " data-filter="drink">İçecek</button>
             </div>
           </div>
         </div>
@@ -67,10 +75,10 @@
         <div id="menuGrid" class="grid gap-3 grid-cols-2"></div>
       </div>
 
-      <!-- EVENTS SLIDER (dynamic, başlangıçta gizli) -->
+      <!-- EVENTS SLIDER -->
       <section id="eventsSection" class="px-3 mt-10 justify-center items-center is-hidden" aria-labelledby="events-title">
         <h2 id="events-title" class="text-sm font-semibold text-center">Gelecek Etkinlikler</h2>
-        <div class="auto-slider" id="eventsSlider">
+        <div class="auto-slider" id="eventsSlider" tabindex="0" aria-label="Etkinlik görsel slider">
           <div class="track" id="autoTrack"></div>
           <button class="nav prev" type="button" data-dir="prev" aria-label="Önceki görsel">‹</button>
           <button class="nav next" type="button" data-dir="next" aria-label="Sonraki görsel">›</button>
@@ -88,7 +96,7 @@
             <a href="https://www.facebook.com/people/Üsküdar-Sahne/61571611235950" target="_blank" rel="noopener" aria-label="Facebook" title="Facebook">
               <img src="https://qrmenu-cdn.b-cdn.net/assets/facebook.png" alt="Facebook"/>
             </a>
-            <a href="https://www.google.com/maps/place/ÜSKÜDAR+SAHNE/@41.0251341,29.0139226,919m/data=!3m1!1e3!4m6!3m5!1s0x14cab739fbd2417d:0xe334930169f75ef2!8m2!3d41.0251341!4d29.0139226!16s%2Fg%2F11wv9tk232?entry=ttu" target="_blank" rel="noopener" aria-label="Google Maps" title="Google Maps">
+            <a href="https://www.google.com/maps/place/ÜSKÜDAR+SAHNE/..." target="_blank" rel="noopener" aria-label="Google Maps" title="Google Maps">
               <img src="https://icons.iconarchive.com/icons/dtafalonso/android-lollipop/32/Maps-icon.png" alt="Google Maps" width="30" height="30">
             </a>
           </div>
@@ -141,7 +149,7 @@
 
         const a = document.createElement('a');
         a.className = 'block filter-card';
-        a.dataset.cat = kind; // menü filtresi için
+        a.dataset.cat = kind;
         a.href = `menu.html?category=${encodeURIComponent(slug)}&categoryId=${encodeURIComponent(id)}`;
         a.innerHTML = `
           <div class="overflow-hidden rounded-sm">
@@ -207,8 +215,70 @@
         sliderTimer = setInterval(()=> go(index + 1), 3500);
       };
 
-      prevBtn.onclick = ()=>{ go(index - 1); start(); };
-      nextBtn.onclick = ()=>{ go(index + 1); start(); };
+      // --- BUTONLAR (manuel kontrol) ---
+      prevBtn.onclick = (e)=>{ e.preventDefault(); e.stopPropagation(); go(index - 1); start(); };
+      nextBtn.onclick = (e)=>{ e.preventDefault(); e.stopPropagation(); go(index + 1); start(); };
+
+      // --- KLAVYE (sol/sağ ok) ---
+      container.addEventListener('keydown', (e)=>{
+        if(e.key === 'ArrowLeft'){ go(index - 1); start(); }
+        if(e.key === 'ArrowRight'){ go(index + 1); start(); }
+      });
+
+      // --- SÜRÜKLEME / SWIPE (mouse + touch + pen) ---
+      let isDown = false, startX = 0, deltaX = 0;
+
+      const getX = (ev) => ('touches' in ev) ? ev.touches[0].clientX : ev.clientX;
+      const thresholdPx = ()=> Math.max(40, container.clientWidth * 0.18); // %18 veya min 40px
+
+      const onDown = (ev)=>{
+        // butona basıldıysa sürükleme başlatma
+        if (ev.target.closest('.nav')) return;
+        isDown = true;
+        startX = getX(ev);
+        deltaX = 0;
+        container.classList.add('dragging');
+        destroyAutoSlider();
+        // pointer event ise capture al
+        if (ev.pointerId && container.setPointerCapture) {
+          try { container.setPointerCapture(ev.pointerId); } catch {}
+        }
+      };
+
+      const onMove = (ev)=>{
+        if(!isDown) return;
+        deltaX = getX(ev) - startX;
+        const pct = (deltaX / container.clientWidth) * 100;
+        track.style.transform = `translateX(${(-index * 100) + pct}%)`;
+      };
+
+      const onUp = ()=>{
+        if(!isDown) return;
+        container.classList.remove('dragging');
+        const th = thresholdPx();
+        if (Math.abs(deltaX) > th) {
+          go(index + (deltaX < 0 ? 1 : -1));
+        } else {
+          go(index); // geri yerine oturt
+        }
+        start();
+        isDown = false;
+        deltaX = 0;
+      };
+
+      // Pointer Events (modern tarayıcıların tamamı)
+      container.addEventListener('pointerdown', onDown);
+      container.addEventListener('pointermove', onMove);
+      container.addEventListener('pointerup', onUp);
+      container.addEventListener('pointercancel', onUp);
+      container.addEventListener('pointerleave', onUp);
+
+      // iOS eski WebView için emniyet kemeri (touch)
+      container.addEventListener('touchstart', onDown, {passive:true});
+      container.addEventListener('touchmove', onMove, {passive:true});
+      container.addEventListener('touchend', onUp);
+
+      // Hover’da dur, ayrılınca devam et
       container.addEventListener('mouseenter', ()=> destroyAutoSlider());
       container.addEventListener('mouseleave', ()=> start());
       window.addEventListener('visibilitychange', ()=> document.hidden ? destroyAutoSlider() : start());
@@ -221,7 +291,6 @@
       const section = document.getElementById('eventsSection');
       const track = document.getElementById('autoTrack');
 
-      // veri yoksa gizli kalsın
       if(!Array.isArray(events) || events.length === 0){
         section.classList.add('is-hidden');
         destroyAutoSlider();
@@ -229,7 +298,6 @@
         return;
       }
 
-      // veri varsa görünür yap ve doldur
       section.classList.remove('is-hidden');
       track.innerHTML = '';
 
@@ -265,7 +333,6 @@
         const data = await res.json();
         renderEventsSlider(data);
       }catch(e){
-        // hata halinde de gizli kalsın
         renderEventsSlider([]);
         console.error('[events]', e);
       }

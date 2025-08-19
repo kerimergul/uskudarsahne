@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
   <title>Üsküdar Sahne Menü</title>
 
+  <!-- Preconnect: API & CDN el sıkışmasını hızlandır -->
+  <link rel="preconnect" href="https://uskudarsahne-api.onrender.com" crossorigin>
+  <link rel="preconnect" href="https://qrmenu-cdn.b-cdn.net" crossorigin>
+
   <!-- CSS / Assets -->
   <link rel="stylesheet" href="https://qrmenu-cdn.b-cdn.net/css/1.css" data-precedence="next" />
   <link rel="stylesheet" href="https://qrmenu-cdn.b-cdn.net/css/2.css" data-precedence="next" />
@@ -14,85 +18,62 @@
   <meta name="next-size-adjust"/>
 
   <style>
-    :root{
-      --qrblue: #2563eb;
-    }
+    :root{ --qrblue:#2563eb; }
     /* Üst şerit yatay scroll alanı */
-    .scroll-area [data-radix-scroll-area-viewport] {
-      scrollbar-width: none;
-      -ms-overflow-style: none;
-      -webkit-overflow-scrolling: touch;
+    .scroll-area [data-radix-scroll-area-viewport]{
+      scrollbar-width:none; -ms-overflow-style:none; -webkit-overflow-scrolling:touch;
     }
-    .scroll-area [data-radix-scroll-area-viewport]::-webkit-scrollbar { display: none; }
-    .scroll-area :where([data-radix-scroll-area-viewport]) { display: flex; flex-direction: column; align-items: stretch; }
-    .scroll-area :where([data-radix-scroll-area-content]) { flex-grow: 1; }
-    /* Bölüm başlıkları scroll hedefi olduğunda üstte biraz pay bıraksın */
-    .cat-section { scroll-margin-top: 12px; }
+    .scroll-area [data-radix-scroll-area-viewport]::-webkit-scrollbar{ display:none; }
+    .scroll-area :where([data-radix-scroll-area-viewport]){ display:flex; flex-direction:column; align-items:stretch; }
+    .scroll-area :where([data-radix-scroll-area-content]){ flex-grow:1; }
+
+    /* Bölüm başlıkları scroll hedefi olduğunda üstte pay */
+    .cat-section{ scroll-margin-top:12px; content-visibility:auto; contain-intrinsic-size: 800px; }
+
     /* Aktif/pasif kategori sekmesi */
-    .cat-tab { transition: color .2s ease; }
-    .cat-tab[data-active="true"] { color: var(--qrblue, #2563eb); font-weight: 600; }
-    .cat-tab[data-active="false"] { color: #000; font-weight: 300; }
+    .cat-tab{ transition:color .2s ease; }
+    .cat-tab[data-active="true"]{ color:var(--qrblue,#2563eb); font-weight:600; }
+    .cat-tab[data-active="false"]{ color:#000; font-weight:300; }
 
-    /* ====== Sticky Kategori Bar (two-state, no animation, fixed) ====== */
-    .catbar {
-      position: fixed;
-      top: env(safe-area-inset-top, 0);
-      left: 0; right: 0;
-      z-index: 1000;
-      background: rgba(255,255,255,0.95);
-      -webkit-backdrop-filter: blur(8px);
-      backdrop-filter: blur(8px);
-    }
-    /* İçeriği ortalamak için iç container zaten max-w-[500px] ve mx-auto */
-    .catbar .thumbWrap { display: block; }
-    .catbar.compact .thumbWrap { display: none; } /* resimleri tamamen gizle */
-    .catbar .tabText { padding: 6px 8px; }
-    .catbar.compact .tabText { padding: 8px 10px; }
-    .catbar.compact .cat-tab { font-size: 12px; }
-    /* item genişliği: normal 109px, compact metne göre */
-    #categoryBar > div { width: 109px; }
-    .catbar.compact #categoryBar > div { width: auto !important; }
+    /* Sticky Kategori Bar (iki durumlu, animasyonsuz) */
+    .catbar{ position:fixed; top:env(safe-area-inset-top,0); left:0; right:0; z-index:1000;
+      background:rgba(255,255,255,.95); -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); }
+    .catbar .thumbWrap{ display:block; }
+    .catbar.compact .thumbWrap{ display:none; }
+    .catbar .tabText{ padding:6px 8px; }
+    .catbar.compact .tabText{ padding:8px 10px; }
+    .catbar.compact .cat-tab{ font-size:12px; }
+    #categoryBar>div{ width:109px; }
+    .catbar.compact #categoryBar>div{ width:auto!important; }
 
-    /* ====== Lazy image (placeholder) ====== */
-    .lazy-img {
-      background: #eee;
-      filter: blur(6px);
-      transform: scale(1.02);
-      transition: filter .3s ease, transform .3s ease, opacity .3s ease;
-    }
-    .lazy-img.loaded {
-      filter: blur(0);
-      transform: none;
-    }
+    /* Lazy image (hafif; blur kaldırıldı → daha az paint maliyeti) */
+    .lazy-img{ background:#eee; opacity:.95; transition:opacity .25s ease; }
+    .lazy-img.loaded{ opacity:1; }
 
-    /* ====== Back To Top Button ====== */
-    .backTopBtn{
-      position: fixed; inset: auto 16px 16px auto;
-      display: none; align-items: center; justify-content: center;
-      width: 44px; height: 44px; border-radius: 999px;
-      background: #111827; color: #fff; font-size: 18px; line-height: 1;
-      box-shadow: 0 8px 22px rgba(0,0,0,.25);
-      z-index: 9999; border: 1px solid rgba(255,255,255,.12);
-    }
+    /* Skeleton */
+    .skeleton{ background:linear-gradient(90deg,#eee 25%,#f5f5f5 37%,#eee 63%); background-size:400% 100%;
+      animation:shine 1.1s infinite; }
+    @keyframes shine{ 0%{background-position:100% 0} 100%{background-position:0 0} }
+
+    /* Back To Top */
+    .backTopBtn{ position:fixed; inset:auto 16px 16px auto; display:none; align-items:center; justify-content:center;
+      width:44px; height:44px; border-radius:999px; background:#111827; color:#fff; font-size:18px; line-height:1;
+      box-shadow:0 8px 22px rgba(0,0,0,.25); z-index:9999; border:1px solid rgba(255,255,255,.12); }
     .backTopBtn.show{ display:flex; }
-    .backTopBtn:active{ transform: scale(0.98); }
-
-    @media (min-width: 640px){
-      .backTopBtn{ width: 50px; height: 50px; font-size: 20px; }
-    }
+    .backTopBtn:active{ transform:scale(.98); }
+    @media (min-width:640px){ .backTopBtn{ width:50px; height:50px; font-size:20px; } }
   </style>
 </head>
 <body>
   <div class="__className_e8ce0c">
     <div class="min-h-screen w-full max-w-[500px] md:justify-self-center bg-qrbackground pb-7 mx-auto">
 
-      <!-- ÜST YATAY KATEGORİ ŞERİDİ (dinamik, fixed two-state) -->
+      <!-- ÜST YATAY KATEGORİ ŞERİDİ -->
       <div id="catArea" class="catbar">
         <div class="container mx-auto mb-3 px-3">
-          <div dir="ltr" class="relative w-full whitespace-nowrap mb-0 overflow-hidden scroll-area"
-               style="position: relative; --radix-scroll-area-corner-width: 0px; --radix-scroll-area-corner-height: 0px;">
-            <div data-radix-scroll-area-viewport class="h-fit w-full rounded-[inherit]" style="overflow: scroll;">
-              <div data-radix-scroll-area-content style="min-width: fit-content;">
+          <div dir="ltr" class="relative w-full whitespace-nowrap mb-0 overflow-hidden scroll-area">
+            <div data-radix-scroll-area-viewport class="h-fit w-full rounded-[inherit]" style="overflow:scroll;">
+              <div data-radix-scroll-area-content style="min-width:fit-content;">
                 <div id="categoryBar" class="flex w-max space-x-1 p-0 pt-1"><!-- JS dolduracak --></div>
               </div>
             </div>
@@ -103,9 +84,9 @@
       <!-- Fixed bar spacer -->
       <div id="catSpacer" style="height:0;"></div>
 
-      <!-- TÜM KATEGORİ+ÜRÜNLER (dinamik) -->
+      <!-- TÜM KATEGORİ+ÜRÜNLER (her bölüm lazy yüklenecek) -->
       <div class="menu-items px-3" id="menuRoot"><!-- JS dolduracak --></div>
-   
+
     </div>
   </div>
 
@@ -116,78 +97,56 @@
   <script>
     const API_BASE = "https://uskudarsahne-api.onrender.com";
     const PLACEHOLDER_SRC = "https://qrmenu-cdn.b-cdn.net/assets/logo.jpg";
-    const FALLBACK_IMG = PLACEHOLDER_SRC; // Yükleme hatasında da bunu kullan
+    const FALLBACK_IMG = PLACEHOLDER_SRC;
 
-    // Tek seferlik placeholder fetch → blob:URL
+    // Küçük optimizasyon: placeholder'ı arka planda blob'a çevir ama bekleme yok
     let PLACEHOLDER_URL = PLACEHOLDER_SRC;
-    const placeholderReady = (async ()=>{
-      try{
-        const res = await fetch(PLACEHOLDER_SRC, { mode:'cors', credentials:'omit', cache:'force-cache' });
-        const blob = await res.blob();
-        PLACEHOLDER_URL = URL.createObjectURL(blob);
-      }catch(e){
-        PLACEHOLDER_URL = PLACEHOLDER_SRC;
-      }
-      return PLACEHOLDER_URL;
-    })();
+    (async ()=>{ try{
+      const res = await fetch(PLACEHOLDER_SRC, {credentials:'omit', cache:'force-cache'});
+      const b = await res.blob(); PLACEHOLDER_URL = URL.createObjectURL(b);
+    }catch(_){ /* yoksa önemli değil */ } })();
 
-    // Türkçe slug
+    // Utils
     function slugifyTR(str=''){
       const map = { 'Ç':'C','Ö':'O','Ş':'S','İ':'I','I':'I','Ü':'U','Ğ':'G','ç':'c','ö':'o','ş':'s','ı':'i','i':'i','ü':'u','ğ':'g' };
-      return String(str).split('').map(ch => map[ch] || ch)
-        .join('').toLowerCase().replace(/[^a-z0-9\s-]/g,'')
-        .trim().replace(/\s+/g,'-').replace(/-+/g,'-');
+      return String(str).split('').map(ch=>map[ch]||ch).join('').toLowerCase()
+        .replace(/[^a-z0-9\s-]/g,'').trim().replace(/\s+/g,'-').replace(/-+/g,'-');
     }
     const escAttr = s => String(s).replace(/"/g,'&quot;');
-
     async function fetchJSON(url){
-      try{
-        const res = await fetch(url, { credentials: 'omit' });
-        if(!res.ok) throw new Error(`${res.status}`);
-        return await res.json();
-      }catch(e){
-        console.error("[API ERROR]", url, e);
-        return null;
-      }
+      try{ const r = await fetch(url,{credentials:'omit', cache:'no-store'}); if(!r.ok) throw new Error(r.status); return r.json(); }
+      catch(e){ console.error('[API]',url,e); return null; }
     }
-
     function priceToNumber(p){
-      if (p == null) return null;
-      if (typeof p === 'number') return p;
-      if (typeof p === 'string') return parseFloat(p.replace(',', '.'));
-      if (typeof p === 'object' && p.$numberDecimal) return parseFloat(p.$numberDecimal);
-      try { return parseFloat(p); } catch { return null; }
+      if (p==null) return null;
+      if (typeof p==='number') return p;
+      if (typeof p==='string') return parseFloat(p.replace(',', '.'));
+      if (typeof p==='object' && p.$numberDecimal) return parseFloat(p.$numberDecimal);
+      try{ return parseFloat(p); }catch{ return null; }
     }
     function formatTRY(p){
       const n = priceToNumber(p);
-      if (isNaN(n) || n == null) return '';
-      return n.toLocaleString('tr-TR', { style: 'currency', currency: 'TRY', minimumFractionDigits: 2 });
+      if (isNaN(n) || n==null) return '';
+      return n.toLocaleString('tr-TR', { style:'currency', currency:'TRY', minimumFractionDigits:2 });
     }
 
-    /* ===== Lazy Loader ===== */
+    /* ====== Lazy image (IntersectionObserver) ====== */
     function setupLazyImages(root=document){
-      const imgs = Array.from(root.querySelectorAll('img.lazy-img'));
+      const imgs = Array.from(root.querySelectorAll('img.lazy-img[data-src]'));
       if (!imgs.length) return;
-
-      const onIntersect = (entries, obs)=>{
-        entries.forEach(entry=>{
-          if(!entry.isIntersecting) return;
-          const img = entry.target;
-          const real = img.dataset.src;
-          if(real){
-            img.onload = ()=> img.classList.add('loaded');
-            img.onerror = ()=> { img.src = PLACEHOLDER_URL; img.classList.add('loaded'); };
-            img.src = real;
-            img.removeAttribute('data-src');
-          }
-          obs.unobserve(img);
-        });
-      };
-      const io = new IntersectionObserver(onIntersect, { root: null, rootMargin: '200px 0px', threshold: 0.01 });
-      imgs.forEach(img => io.observe(img));
+      const io = new IntersectionObserver((entries,obs)=>{
+        for(const e of entries){
+          if(!e.isIntersecting) continue;
+          const img = e.target; const real = img.dataset.src;
+          img.onload = ()=> img.classList.add('loaded');
+          img.onerror = ()=> { img.src = FALLBACK_IMG; img.classList.add('loaded'); };
+          img.src = real; img.removeAttribute('data-src'); obs.unobserve(img);
+        }
+      }, { root:null, rootMargin:'250px 0px', threshold:0.01 });
+      imgs.forEach(i=> io.observe(i));
     }
 
-    // --- UI Renderers ---
+    /* ====== Renderers ====== */
     function renderCategoryTabs(categories){
       const bar = document.getElementById('categoryBar');
       bar.innerHTML = '';
@@ -200,16 +159,18 @@
         el.dataset.slug = slug;
         el.innerHTML = `
           <div class="thumbWrap h-[84px] pt-1 line-clamp-1">
-            <img alt="${escAttr(c.name)}" loading="lazy" width="1920" height="1080" decoding="async"
+            <img alt="${escAttr(c.name)}" width="1920" height="1080" decoding="async"
                  class="w-full h-full object-cover rounded-t-sm lazy-img"
-                 src="${PLACEHOLDER_URL}" data-src="${real}" style="color: transparent;"/>
+                 src="${PLACEHOLDER_URL}" data-src="${real}" style="color:transparent;" loading="lazy">
           </div>
-          <div class="tabText p-1.5 bg-black/10 bg-black/30 rounded-b-sm">
+          <div class="tabText p-1.5 bg-black/10 rounded-b-sm">
             <h3 class="text-[11px] leading-tight tracking-tight text-center line-clamp-1">
               <span class="cat-tab" data-active="false">${c.name||''}</span>
             </h3>
           </div>`;
-        el.addEventListener('click', ()=> scrollToCategory(slug));
+        el.addEventListener('click', ()=>{
+          ensureProductsLoaded(slug, c._id).then(()=> scrollToCategory(slug));
+        });
         bar.appendChild(el);
       }
       setupLazyImages(bar);
@@ -221,15 +182,14 @@
       const desc = p.description || '';
       const priceText = formatTRY(p.price);
       return `
-      <div class="">
+      <div>
         <div class="relative">
           <div class="bg-qrborder/0 border-none rounded-sm cursor-pointer">
             <div class="p-0 flex">
               <div class="w-[50%] aspect-[4/3] flex-shrink-0 relative">
-                <img alt="${escAttr(name)}" loading="lazy" width="1600" height="1200" decoding="async"
+                <img alt="${escAttr(name)}" width="1600" height="1200" decoding="async"
                      class="w-full h-full object-cover rounded-sm lazy-img"
-                     src="${PLACEHOLDER_URL}" data-src="${real}" style="color: transparent;"/>
-                <div class="absolute top-1.5 right-1.5 flex flex-row gap-1.5"></div>
+                     src="${PLACEHOLDER_URL}" data-src="${real}" style="color:transparent;" loading="lazy">
               </div>
               <div class="w-[50%] flex flex-col justify-between py-1.5 pl-2.5">
                 <div>
@@ -239,7 +199,7 @@
                   <p class="text-[11px] mt-1 text-gray-700 line-clamp-4 font-light">${escAttr(desc)}</p>
                 </div>
                 <div class="flex items-center space-x-2">
-                  <span class="font-light text-[13px] whitespace-nowrap"><span>${priceText}</span></span>
+                  <span class="font-light text-[13px] whitespace-nowrap">${priceText}</span>
                 </div>
               </div>
             </div>
@@ -260,7 +220,10 @@
           </div>
         </div>
         <div class="grid gap-2.5 grid-cols-1" id="grid-${slug}">
-          <!-- ürünler gelecek -->
+          <!-- skeleton -->
+          <div class="skeleton h-24 rounded-sm"></div>
+          <div class="skeleton h-24 rounded-sm"></div>
+          <div class="skeleton h-24 rounded-sm"></div>
         </div>
       </section>`;
     }
@@ -268,46 +231,64 @@
     function renderAllSections(categories){
       const root = document.getElementById('menuRoot');
       root.innerHTML = '';
-      for (const c of categories) {
-        root.insertAdjacentHTML('beforeend', categorySectionHTML(c));
-      }
+      for (const c of categories) root.insertAdjacentHTML('beforeend', categorySectionHTML(c));
     }
 
-    async function fillProductsFor(categories){
-      await Promise.all(categories.map(async c=>{
-        const slug = slugifyTR(c.name||'');
-        const grid = document.getElementById(`grid-${slug}`);
-        const list = await fetchJSON(`${API_BASE}/api/products?categoryId=${encodeURIComponent(c._id)}&limit=500`);
-        if (!Array.isArray(list) || list.length===0){
-          grid.innerHTML = `<div class="text-center text-xs opacity-70 py-4">Bu kategoride ürün yok.</div>`;
-          return;
-        }
-        // Backend zaten order'a göre sıralı döndürüyor → ek bir sıralama YOK
-        grid.innerHTML = list.map(productCardHTML).join('');
+    /* ====== Progressive Loader (kategori bazlı) ====== */
+    const loadedSlugs = new Set();
+    async function ensureProductsLoaded(slug, categoryId){
+      if (loadedSlugs.has(slug)) return;
+      const grid = document.getElementById(`grid-${slug}`);
+      if (!grid) return;
+      // ürünleri çek
+      const list = await fetchJSON(`${API_BASE}/api/products?categoryId=${encodeURIComponent(categoryId)}&limit=500`);
+      if (!Array.isArray(list) || list.length===0){
+        grid.innerHTML = `<div class="text-center text-xs opacity-70 py-4">Bu kategoride ürün yok.</div>`;
+      }else{
+        // DOM insert tek seferde
+        const html = list.map(productCardHTML).join('');
+        grid.innerHTML = html;
         setupLazyImages(grid);
-      }));
+      }
+      loadedSlugs.add(slug);
     }
 
-    // --- Scroll & Active Tab ---
-    
+    function attachSectionLoader(categories){
+      const idBySlug = new Map(categories.map(c=> [slugifyTR(c.name||''), c._id]));
+      const io = new IntersectionObserver((entries)=>{
+        for(const e of entries){
+          if(!e.isIntersecting) continue;
+          const slug = e.target.id.replace(/^category-/,'');
+          const id = idBySlug.get(slug);
+          if (id) ensureProductsLoaded(slug, id);
+        }
+      }, { root:null, rootMargin:'200px 0px', threshold:0.01 });
+      categories.forEach(c=>{
+        const sec = document.getElementById(`category-${slugifyTR(c.name||'')}`);
+        if (sec) io.observe(sec);
+      });
+    }
+
+    /* ====== Scroll & Active Tab ====== */
     function scrollToCategory(slug){
       const sec = document.getElementById(`category-${slug}`);
       if (!sec) return;
       const catArea = document.getElementById('catArea');
       const h = catArea ? catArea.getBoundingClientRect().height : 0;
-      const extra = 10; // başlık biraz boşlukla görünsün
+      const extra = 10;
       const y = window.scrollY + sec.getBoundingClientRect().top - (h + extra);
-      window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
-      const tab = [...document.querySelectorAll('#categoryBar > div')].find(d => d.dataset.slug === slug);
-      if (tab) tab.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+      window.scrollTo({ top: Math.max(0,y), behavior:'smooth' });
+
+      const tab = [...document.querySelectorAll('#categoryBar > div')].find(d=> d.dataset.slug===slug);
+      if (tab) tab.scrollIntoView({ behavior:'smooth', inline:'center', block:'nearest' });
+
       const params = new URLSearchParams(location.search);
       params.set('category', slug);
-      history.replaceState(null, '', `${location.pathname}?${params.toString()}`);
+      history.replaceState(null,'', `${location.pathname}?${params.toString()}`);
     }
 
-
     function setActiveSlug(slug){
-      document.querySelectorAll('.cat-tab').forEach(el => el.setAttribute('data-active','false'));
+      document.querySelectorAll('.cat-tab').forEach(el=> el.setAttribute('data-active','false'));
       const active = document.querySelector(`#categoryBar > div[data-slug="${slug}"] .cat-tab`);
       if (active) active.setAttribute('data-active','true');
     }
@@ -322,26 +303,24 @@
 
       let current = null;
       const obs = new IntersectionObserver((entries)=>{
-        const visible = entries.filter(e=> e.isIntersecting).sort((a,b)=> a.boundingClientRect.top - b.boundingClientRect.top);
+        const visible = entries.filter(e=> e.isIntersecting)
+          .sort((a,b)=> a.boundingClientRect.top - b.boundingClientRect.top);
         if (visible.length){
-          const id = visible[0].target.id;
-          const slug = id.replace(/^category-/, '');
-          if (slug !== current){
-            current = slug;
-            setActiveSlug(slug);
-          }
+          const slug = visible[0].target.id.replace(/^category-/,'');
+          if (slug !== current){ current = slug; setActiveSlug(slug); }
         }
-      }, { root: null, threshold: 0.5 });
+      }, { root:null, threshold:0.5 });
 
       for (const [,sec] of mapSlugToEl) obs.observe(sec);
 
       const initial = new URLSearchParams(location.search).get('category');
       if (initial && mapSlugToEl.has(initial)) {
-        setActiveSlug(initial);
-        setTimeout(()=> scrollToCategory(initial), 50);
-      } else {
-        const first = categories.length ? slugifyTR(categories[0].name||'') : null;
-        if (first) setActiveSlug(first);
+        // İlk hedef kategori: önce ürünleri yükle, ardından kaydır
+        ensureProductsLoaded(initial, categories.find(c=>slugifyTR(c.name||'')===initial)._id)
+          .then(()=> setTimeout(()=> scrollToCategory(initial), 50));
+      } else if (categories.length){
+        const first = slugifyTR(categories[0].name||'');
+        setActiveSlug(first);
       }
     }
 
@@ -350,45 +329,51 @@
       const catArea = document.getElementById('catArea');
       const spacer = document.getElementById('catSpacer');
       if (!catArea || !spacer) return;
-      const h = catArea.getBoundingClientRect().height;
-      spacer.style.height = h + 'px';
+      spacer.style.height = catArea.getBoundingClientRect().height + 'px';
     }
     function handleScrollUI(){
       const y = window.scrollY || document.documentElement.scrollTop || 0;
       const catArea = document.getElementById('catArea');
       const btnTop = document.getElementById('btnTop');
-      const compactOn = y > 0; // üstte değilse küçük mod
+      const compactOn = y > 0;
       catArea.classList.toggle('compact', compactOn);
       btnTop.classList.toggle('show', y > 250);
       resizeSpacer();
     }
 
-    // ---- BOOT ----
+    /* ====== BOOT ====== */
     document.addEventListener('DOMContentLoaded', async ()=>{
-      // Placeholder'ı tek seferlik hazırlarken kategorileri ve ürünleri getir
-      await placeholderReady;
-
       const categories = await fetchJSON(`${API_BASE}/api/categories`);
       if (!Array.isArray(categories) || categories.length===0){
         document.getElementById('menuRoot').innerHTML =
           `<div class="text-center text-xs opacity-70 py-6">Kategori bulunamadı.</div>`;
         return;
       }
+
+      // 1) Başlık/sekme ve bölümleri ANINDA bas
       renderCategoryTabs(categories);
       renderAllSections(categories);
-      await fillProductsFor(categories);
+
+      // 2) Gözükmeye başlayınca ürünler yüklensin
+      attachSectionLoader(categories);
+
+      // 3) Aktif sekme takibi
       attachActiveObserver(categories);
 
-      // Scroll & resize davranışları
+      // 4) UI davranışları
       handleScrollUI();
-      window.addEventListener('scroll', handleScrollUI, { passive: true });
-      window.addEventListener('resize', ()=>{ resizeSpacer(); }, { passive: true });
+      window.addEventListener('scroll', handleScrollUI, { passive:true });
+      window.addEventListener('resize', ()=> resizeSpacer(), { passive:true });
 
-      // Back to top
-      document.getElementById('btnTop').addEventListener('click', ()=> {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      });
+      // 5) İlk ekranda görünen 1-2 bölümü önceden ısıt (hızlı LCP)
+      const first = slugifyTR(categories[0].name||'');
+      ensureProductsLoaded(first, categories[0]._id);
+      if (categories[1]) {
+        const second = slugifyTR(categories[1].name||'');
+        ensureProductsLoaded(second, categories[1]._id);
+      }
     });
+
   </script>
 </body>
 </html>
