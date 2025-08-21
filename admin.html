@@ -866,7 +866,7 @@
         const title = esc(obj.name||'');
         let sub = '';
         if(TAB==='cats') sub = (obj.kind==='drink'?'İçecek':'Yemek') + (obj.updatedAt? ` · ${new Date(obj.updatedAt).toLocaleDateString('tr-TR')}` : '');
-        if(TAB==='prods') sub = `${fmt(obj.price)}${obj.categoryId? ' · '+(catMap.get(String(obj.categoryId)) || ''):''}`;
+        if(TAB==='prods') sub = `${formatTRY(obj.price)}${obj.categoryId? ' · '+(catMap.get(String(obj.categoryId)) || ''):''}`;
         if(TAB==='events'){
           const when = formatEventDate(obj.eventDate) || (obj.updatedAt? new Date(obj.updatedAt).toLocaleDateString('tr-TR') : '');
           sub = when;
@@ -889,6 +889,19 @@
       list.forEach(o=> grid.append(toCard(o)));
 
       if(!FILTER){ enableDragSort(grid, fullList); }
+    }
+
+    function priceToNumber(p){
+      if (p==null) return null;
+      if (typeof p==='number') return p;
+      if (typeof p==='string') return parseFloat(p.replace(',', '.'));
+      if (typeof p==='object' && p.$numberDecimal) return parseFloat(p.$numberDecimal);
+      try{ return parseFloat(p); }catch{ return null; }
+    }
+    function formatTRY(p){
+      const n = priceToNumber(p);
+      if (isNaN(n) || n==null) return '';
+      return n.toLocaleString('tr-TR', { style:'currency', currency:'TRY', minimumFractionDigits:2 });
     }
 
     function enableDragSort(grid, fullList){
